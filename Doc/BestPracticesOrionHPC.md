@@ -2,14 +2,17 @@
 
 **Login into orion** 
 
-To log into Orin we need two things:
-- Stablish a VPN connection
+To login into Orin we need two things:
+- Establish a VPN connection
 - Use a secure-shell command [ssh](https://en.wikipedia.org/wiki/SSH_(Secure_Shell))
 
-*For loging just type something like this. Remember to change to your username bio326-21-x*
+For loging just type something like this. 
+
 ```bash
 $ ssh bio326-21-0@login.nmbu.no
 ```
+*Remember to change to your username bio326-21-x*
+
 This will ask for your password. Type it
 
 *Even you don't see anything the password is typed*
