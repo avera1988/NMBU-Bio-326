@@ -39,13 +39,26 @@ PS: We are on Teams: https://bit.ly/orion-teams
 
 **Now you are logged into the Orion login-node.**
 
-### Directories in Orion 
+### Orion main confifuration 
 
 Let's take a look into this figure: 
 
 ![Cluster](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/cluster.png)
 
+**NEVER RUN A JOB IN THE LOGIN NODE!!! THE LOGIN NODE IS ONLY FOR LOOKING AND MANAGING FILES, INSTALL SOFTWARE AND WRITE SCRIPTS** 
 
+How can I be sure of the number of CPUs and RAM of this "login" computer node and other nodes?
 
+* CPUS: Use the command nproc
 
+```Bash
+[bio326-21-0@login ~]$ nproc 
+6
+```
 
+* RAM: We need to look for the "Total memory". All this info is allocated in the meminfo file at /proc directory. So we can use the grep command to look for this into the file.
+
+```
+bio326-21-0@login ~]$ grep MemTotal /proc/meminfo
+MemTotal:       32744196 kB
+```
