@@ -6,7 +6,7 @@ To login into Orin we need two things:
 - Establish a VPN connection
 - Use a secure-shell command [ssh](https://en.wikipedia.org/wiki/SSH_(Secure_Shell))
 
-For loging just type something like this. 
+For login just type something like this. 
 
 ```bash
 $ ssh bio326-21-0@login.nmbu.no
@@ -42,7 +42,7 @@ PS: We are on Teams: https://bit.ly/orion-teams
 
 **Now you are logged into the Orion login-node.**
 
-### Orion main confifuration 
+### Orion main configuration 
 
 Let's take a look into this figure: 
 
@@ -65,3 +65,6 @@ How can I be sure of the number of CPUs and RAM of this "login" computer node an
 bio326-21-0@login ~]$ grep MemTotal /proc/meminfo
 MemTotal:       32744196 kB
 ```
+
+As you can see, this computer is not well suitable for "heavy" computational work. So if we want to do some work (e.g. run BLAST or assembly a genome) we need to send this (job) into a compute node.
+
