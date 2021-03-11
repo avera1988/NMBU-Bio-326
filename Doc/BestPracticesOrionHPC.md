@@ -728,7 +728,7 @@ echo "I am done at" ##Legend to know what the job is doing
 date
 ```
 
-**You can copy this script to your $SCRATCH or $HOME directory from /mnt/SCRATCH/bio326-21/BestPracticesOrion_031221/myfisrt.blastp.SLURM.sh
+**You can copy this script to your $SCRATCH or $HOME directory from /mnt/SCRATCH/bio326-21/BestPracticesOrion_031221/myfisrt.blastp.SLURM.sh **
 
 ```
 [bio326-21-0@login bio326-21-0]$ cp /mnt/SCRATCH/bio326-21/BestPracticesOrion_031221/myfisrt.blastp.SLURM.sh .
