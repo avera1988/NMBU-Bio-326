@@ -146,7 +146,7 @@ In this case the State column showed status of the node. It means, how many reso
 
 Summarizing, the only nodes that can accept jobs under the previous conditions are those with "MIXED" status. 
 
-## Memory quota in $HOME, $SCRATHC and $TMPDIR 
+## Memory quota in $HOME, $SCRATCH and $TMPDIR 
 
 As a user you can check the ammount of space used in different directories. To check all the disks and partitions in Orion we can run the following command:
 
@@ -242,7 +242,7 @@ Filesystem      Size  Used Avail Use% Mounted on
 fs-1:/home01     76T   75T  1.8T  98% /net/fs-1/home01
 ```
 
-**All users have access to the $HOME, so please DO NOT USE THE $HOME FOR STORAGE LARGE FILES (e.g. fastq, sam, databases). The $HOME directory is intended to allocate small software executables and SLURM scripts **
+**All users have access to the $HOME, so please DO NOT USE THE $HOME FOR STORAGE LARGE FILES (e.g. fastq, sam, databases). The $HOME directory is intended to allocate small software executables and SLURM scripts**
 
 ### Where can I storage large files? 
 
@@ -250,13 +250,302 @@ There are two dierectories designed to this:
 * $SCRATCH
 * $PROJECT
 
-As a student of this course, we are using the $SCRATCH partition to keep our raw sequencing files and final results. This partition in contrast to the $HOME and $PROJECT is not backed up. Remember to make a copy of your important files!!! All students have a directory in that partition: /mnt/SCRATCH/bio326-21-x ; where x is the student number.
+As a student of this course, we are using the $SCRATCH partition to keep our raw sequencing files and final results. This partition in contrast to the $HOME and $PROJECT is not backed up. **Remember to make a copy of your important files into another location!!!** All students have a directory in that partition: /mnt/SCRATCH/bio326-21-x ; where x is the student number.
 
 Let's move into that partition:
 
 ```
 [bio326-21-0@login ~]$ cd /mnt/SCRATCH/bio326-21-0
 ```
+
+## Running an interactive job to test programs and get used to working in the cluster
+
+The easiest way to test software and to look into huhge files without messing the login node and other users, is by running an **interactive** job in Orion. This means you can book a compute node and type your commands directly in that node. Let's runn by the following commands:
+
+```
+[bio326-21-0@login bio326-21-0]$ srun --cpus-per-task 4 --mem=4G --time=01:00:00 --pty bash -i
+srun: job 12314004 queued and waiting for resources
+```
+*Explaining the command:
+ srun <slurm-options> <software-name/path>
+  
+
+
+It might take a while to SLURM allocate the resources of this job. But as soon as it allocates the job a message like this will be displayed:
+
+```
+srun: job 12314004 has been allocated resources
+
+Welcome to the NMBU Orion compute cluster environment.
+
+You are logged in to a machine that can be used to access your home directory,
+edit your scripts, manage your files, and submit jobs to the cluster environment.
+Do not run any jobs on this machine, as they might be automatically terminated.
+
+IMPORTANT:
+  - Orion introduction: https://orion.nmbu.no/
+  - Orion can handle small-scale projects. Need more CPU hours? Please consider
+    applying for national infrastructure resources: https://www.sigma2.no/
+  - Please, PLEASE do compress your fastq, vcf and other non-compressed files
+    using i.e. pigz.
+
+NEWS:
+  - 2020-10-08: Orion has been re-built. We are still working out many details.
+    Please email us if you miss anything, or notice any issues.
+
+For any Orion related enquiry: orion-support@nmbu.no
+PS: We are on Teams: https://bit.ly/orion-teams
+
+[bio326-21-0@cn-3 bio326-21-0]$ 
+```
+
+You can notice that now the prompt has changed and shows the node we are running on. In this case the node "cn-3". Also if this is not displayed we can take advantage of the many [SLURM_environment_variables](https://slurm.schedmd.com/pdfs/summary.pdf). These are dynamic values that SLURM uses to control the computers. For example, if you would like to know what is the node and number of CPUs requested in this job you can print the values of that SLURM variable by applying the command "echo" follows by the name of the variable:
+
+```
+[bio326-21-0@cn-3 bio326-21-0]$ echo $SLURM_NODELIST 
+cn-3
+[bio326-21-0@cn-3 bio326-21-0]$ echo $SLURM_CPUS_ON_NODE 
+4
+```
+
+Here we can run short parsing scripts, test software with a small datasets, etc. 
+
+### Temporary working directory, faster and more efficient Jobs
+
+Generaly any software can read (data) and write (results) from any partition of the cluster (i.e. $HOME, $SCRATCH, $PROJECT), however, I/O (reading and writing) from those locations uses a lot of networ resulting in a high inefficenfy for heavy jobs (e.g mapping reads to large genomes or metagenomes). Also if multiple users run in the same way the traffic in the network eve using the infiniband makes the jobs super slow. 
+To avoid this we can take advantage of the **$TMPDIR** partition. This is a physical hard-drive allocated in each of the compute nodes. We can migrate the data to here for I/O. Often, quite some efficiency can be gained by doing this.
+
+Let's take a look, first we need to check if our **$USER** exists in that **$TMPDIR**
+
+```
+[bio326-21-0@cn-3 bio326-21-0]$ echo $TMPDIR/$USER
+/home/work/bio326-21-0
+```
+
+This means the user **bio326-21-0** has a directory in the **$TMPDIR** (/home/work). Move to that directory:
+
+```
+[bio326-21-0@cn-3 bio326-21-0]$  cd $TMPDIR/$USER
+[bio326-21-0@cn-3 bio326-21-0]$ pwd
+/home/work/bio326-21-0
+```
+
+Now we need to create an other directory **a work directory** to copy data for executing some commands. We can use another SLURM variable, let's say the JOBID to be consistent.
+
+
+```
+[bio326-21-0@cn-3 bio326-21-0]$ mkdir work.dir.of.$SLURM_JOB_ID 
+[bio326-21-0@cn-3 bio326-21-0]$ ls
+singularity  work.dir.of.12314866
+```
+
+By using the $SLURM_JOB_ID we can further identify what job we are running.
+
+Let's enter to that directory and then copy some fasta files from the **$SCRATCH**, that is a good directory to put raw data. In this class we are using the files from **/mnt/SCRATCH/bio326-21/BestPracticesOrion_031221** path.
+
+```
+[bio326-21-0@cn-3 bio326-21-0]$ cd work.dir.of.12314866/
+[bio326-21-0@cn-3 work.dir.of.12314866]$ pwd
+/home/work/bio326-21-0/work.dir.of.12314866
+```
+
+First take a look of the **/mnt/SCRATCH/bio326-21/BestPracticesOrion_031221** 
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ ls -l /mnt/SCRATCH/bio326-21/BestPracticesOrion_031221
+total 17072
+-rw-rw-r-- 1 auve bio326-21      838 Mar 11 16:29 amylase.Bgramini.fasta
+-rw-rw-r-- 1 auve bio326-21  2085506 Mar 11 16:29 Bacteroides51.faa
+-rw-rw-r-- 1 auve bio326-21 15103261 Mar 11 16:29 Bacteroides51.GCF_010500965.1.gbff
+-rw-rw-r-- 1 auve bio326-21   280161 Mar 11 16:29 Bacteroides51.tab
+```
+
+*Tip: Having more than one terminal open will help to faster look into multiple directories*
+
+As you can see there are multiple files here, lets copy the two fasta files **.faa and .fasta** into the $TMPDIR/workdirectoryforthejob
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ cp /mnt/SCRATCH/bio326-21/BestPracticesOrion_031221/*.fa* .
+[bio326-21-0@cn-3 work.dir.of.12314866]$ ls
+amylase.Bgramini.fasta  Bacteroides51.faa
+```
+
+*Remember that you can copy multiple files using regular expression (REGEX) in this case* * *.fa* * *means "everything that has .fa on it"*
+
+No we can do some work on this files. Take a look of the **amylase.Bgramini.fasta** file 
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ more amylase.Bgramini.fasta 
+>WP_024997086.1 alpha-amylase [Bacteroides graminisolvens]
+MKRYKYWFLLLIPFLIVACSGSDDPVIEPPVVLKEGLNYSPTAPDADQELTITFKAGSTSALYNYVGDVY
+VHIGVIVDGSWKYVPAEWTENISKCKMTKTADNVWSVKLSPTVRQWFASGETSIQKLGIVIRNADGSKKG
+LTDDAFVSVTDSKYKPFTPAAIKYATLPAGVKEGINIVNSSTVTLVLYDKDKSGNHKDYAHVIGDFNSWK
+LTNDDKSQMNRDDAAGCWWITLSGLTGTKEYAFQYYVGTAAEGATRLADAYSRKILDPDNDSYISSTTYN
+EDKTYPQGAEGIVSVFKTEPDTYTWKNTAFKMKDKDDLVIYEMLLRDFTASGDLNGAKAKLSYLKSLGVN
+AIELMPVQEFDGNDSWGYNPCFFFALDKAYGTDKMYKEFIDACHGEGIAVIFDVVYNHATGSHPFAKLYW
+NSATNKTSAQNPWFNVDAPHPYSVFHDFNHESPLVRAFVKRNLEFLLKEYKIDGFRFDLTKGFTQKSSTE
+STASAYDATRIAILKDYNSTVKTVNPSAMMILEHFCDNAEEKELANDGMYLWRNMNYAYCESAMGLPGNS
+DFSGLYDTSMPMGSLVGFMESHDEERMSFKQIAYGNYTFKTSLADRMKQLKVNTAFFLTVPGPKMIWQFG
+ELGYDYSIEENGRTGKKPVKWEYYDDASRKALYDTYAKLMTLRNANTELFDTSALFSWQVKGNTNWLNGR
+FLTLEGGGKKLVVAGNFTNQAGSYTVTFPHTGTWYNYMTGESVSVSATNQTISIPAHEFKLFVDFQSN
+```
+
+This is the sequence of an enzyme (a-amylase) of the bacteria Bacteroides fragilis, I would like to know if an homologue of this sequence is present in the set of sequences of **Bacteroides51.faa** (Bacteroides sp. from cockroaches). The easy way is doing a BLAST search. But is BLAST installed?
+
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ blast
+bash: blast: command not found
+```
+
+It seems not to be installed in the defaiult.
+
+### Modules and singularity
+
+In order to use a software, we need to load the corresponding module first.The Modules package is a tool that simplifies shell initialization and lets users easily modify their environment during a session using modulefiles. You can read more about this on the [Environment Modules](https://modules.readthedocs.io/en/latest/) website.
+
+The following commands let us manage modules in our workflow:
+
+```
+module avail # available modules
+module show # show modules info 
+module list # list loaded modules
+module load # loaded modules
+module unload # unload loaded modules
+module purge # unload all loaded modules
+```
+
+If we want to knwo what modules are already instaled in Orion we can use the following command:
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ module available
+
+--------------------------------------------------------------------------- /usr/share/lmod/lmod/modulefiles/Core ----------------------------------------------------------------------------
+   lmod    settarg
+
+------------------------------------------------------------------------------------ /cluster/modules/all ------------------------------------------------------------------------------------
+   AUGUSTUS/3.3.3-foss-2019b                                         METIS/5.1.0-GCCcore-8.3.0                           foss/2019a
+   Anaconda3/5.3.0                                                   MUSCLE/3.8.31-foss-2018a                            foss/2019b                               (D)
+   Autoconf/2.69-GCCcore-6.4.0                                       Mako/1.1.0-GCCcore-8.3.0                            freetype/2.9.1-GCCcore-8.2.0
+   Autoconf/2.69-GCCcore-7.3.0                                       MariaDB/10.4.13-gompi-2019b                         freetype/2.10.1-GCCcore-8.3.0            (D)
+   Autoconf/2.69-GCCcore-8.2.0                                       Mesa/19.1.7-GCCcore-8.3.0                           gams/30.2.0
+   Autoconf/2.69-GCCcore-8.3.0                                       Meson/0.51.2-GCCcore-8.3.0-Python-3.7.4             gettext/0.19.8.1-GCCcore-8.2.0
+   Autoconf/2.69-GCCcore-9.3.0                             (D)       Miniconda3/4.7.10                                   gettext/0.19.8.1
+   Automake/1.15.1-GCCcore-6.4.0                                     MultiQC/1.9-foss-2019b-Python-3.7.4                 gettext/0.20.1-GCCcore-8.3.0
+   Automake/1.16.1-GCCcore-7.3.0                                     NASM/2.14.02-GCCcore-8.3.0                          gettext/0.20.1-GCCcore-9.3.0
+   Automake/1.16.1-GCCcore-8.2.0                                     NASM/2.14.02-GCCcore-9.3.0                   (D)    gettext/0.20.1                           (D)
+   Automake/1.16.1-GCCcore-8.3.0                                     NLopt/2.6.1-GCCcore-8.3.0                           git/2.23.0-GCCcore-9.3.0-nodocs
+   Automake/1.16.1-GCCcore-9.3.0                           (D)       NSPR/4.21-GCCcore-8.3.0                             gnuplot/5.2.8-GCCcore-8.3.0
+   Autotools/20170619-GCCcore-6.4.0                                  NSS/3.45-GCCcore-8.3.0                              gompi/2018a
+   Autotools/20180311-GCCcore-7.3.0                                  Ninja/1.9.0-GCCcore-8.3.0                           gompi/2018b
+   Autotools/20180311-GCCcore-8.2.0                                  OpenBLAS/0.2.20-GCC-6.4.0-2.28                      gompi/2019a
+   Autotools/20180311-GCCcore-8.3.0                                  OpenBLAS/0.3.1-GCC-7.3.0-2.30                       gompi/2019b
+   Autotools/20180311-GCCcore-9.3.0                        (D)       OpenBLAS/0.3.5-GCC-8.2.0-2.31.1                     gompi/2020a                              (D)
+   BCFtools/1.10.2-GCC-8.3.0                                         OpenBLAS/0.3.7-GCC-8.3.0                     (D)    gperf/3.1-GCCcore-8.2.0
+   BCFtools/1.10.2-GCC-9.3.0                               (D)       OpenMPI/2.1.2-GCC-6.4.0-2.28                        gperf/3.1-GCCcore-8.3.0                  (D)
+   BEDTools/2.27.1-foss-2018b                                        OpenMPI/3.1.1-GCC-7.3.0-2.30                        groff/1.22.4-GCCcore-9.3.0
+   BEDTools/2.29.2-GCC-9.3.0                               (D)       OpenMPI/3.1.3-GCC-8.2.0-2.31.1                      help2man/1.47.4-GCCcore-6.4.0
+   BLAST+/2.9.0-gompi-2019b                                          OpenMPI/3.1.4-GCC-8.3.0                             help2man/1.47.4-GCCcore-7.3.0
+   BLAST+/2.10.1-gompi-2020a                               (D)       OpenMPI/4.0.3-GCC-9.3.0                      (D)    help2man/1.47.4
+   BWA/0.7.17-GCC-9.3.0                                              PCRE/8.43-GCCcore-8.3.0                             help2man/1.47.7-GCCcore-8.2.0
+```
+
+There are two modules of BLAST 
+* BLAST+/2.9.0-gompi-2019b  
+* BLAST+/2.10.1-gompi-2020a
+
+Lets **load** the newest **BLAST+/2.10.1-gompi-2020a**
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ module load BLAST+/2.10.1-gompi-2020a
+```
+
+And then try the command:
+
+```
+[bio326-21-0@cn-3 ~]$ blastp -h
+Illegal instruction
+```
+
+As we can see in this node the blastp is not working. **Particularly in node cn-3 and cn-2, old nodes, module command shows multiple issues.** In that case we can use the singularity container. Singularity is a container platform. It allows you to create and run containers that package up pieces of software in a way that is portable and reproducible. Singularity can works in all nodes. Let's take a look:
+
+First purge all modules:
+
+```
+[bio326-21-0@cn-3 ~]$ module purge[bio326-21-0@cn-3 ~]$ module purge
+ ```
+ 
+This helps to not use the previous modules load (BLAST).
+
+Then load the singularyti container:
+
+```
+[bio326-21-0@cn-3 ~]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/l/blast:2.10.1--pl526he19e7b1_0 blastp -help
+WARNING: Skipping mount /var/singularity/mnt/session/etc/resolv.conf [files]: /etc/resolv.conf doesn't exist in container
+USAGE
+  blastp [-h] [-help] [-import_search_strategy filename]
+    [-export_search_strategy filename] [-task task_name] [-db database_name]
+    [-dbsize num_letters] [-gilist filename] [-seqidlist filename]
+    [-negative_gilist filename] [-negative_seqidlist filename]
+    [-taxids taxids] [-negative_taxids taxids] [-taxidlist filename]
+    [-negative_taxidlist filename] [-ipglist filename]
+    [-negative_ipglist filename] [-entrez_query entrez_query]
+    [-db_soft_mask filtering_algorithm] [-db_hard_mask filtering_algorithm]
+    [-subject subject_input_file] [-subject_loc range] [-query input_file]
+    [-out output_file] [-evalue evalue] [-word_size int_value]
+    [-gapopen open_penalty] [-gapextend extend_penalty]
+    [-qcov_hsp_perc float_value] [-max_hsps int_value]
+    [-xdrop_ungap float_value] [-xdrop_gap float_value]
+    [-xdrop_gap_final float_value] [-searchsp int_value] [-seg SEG_options]
+    [-soft_masking soft_masking] [-matrix matrix_name]
+    [-threshold float_value] [-culling_limit int_value]
+    [-best_hit_overhang float_value] [-best_hit_score_edge float_value]
+    [-subject_besthit] [-window_size int_value] [-lcase_masking]
+    [-query_loc range] [-parse_deflines] [-outfmt format] [-show_gis]
+    [-num_descriptions int_value] [-num_alignments int_value]
+    [-line_length line_length] [-html] [-sorthits sort_hits]
+    [-sorthsps sort_hsps] [-max_target_seqs num_sequences]
+    [-num_threads int_value] [-ungapped] [-remote] [-comp_based_stats compo]
+    [-use_sw_tback] [-version]
+
+DESCRIPTION
+Protein-Protein BLAST 2.10.1+
+
+```
+
+**The basic syntax for singularity is:  singularity [global options...] exec [exec options...] \<container> \<command>**
+
+All the containers are alphatetically sorted.
+
+
+Now we can run our BLAST search. First create a database using the Bacteroides51.faa file:
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/l/blast:2.10.1--pl526he19e7b1_0 makeblastdb -dbtype prot -in Bacteroides51.faa 
+WARNING: Skipping mount /var/singularity/mnt/session/etc/resolv.conf [files]: /etc/resolv.conf doesn't exist in container
+
+
+Building a new DB, current time: 03/11/2021 20:48:39
+New DB name:   /home/work/bio326-21-0/work.dir.of.12314866/Bacteroides51.faa
+New DB title:  Bacteroides51.faa
+Sequence type: Protein
+Keep MBits: T
+Maximum file size: 1000000000B
+Adding sequences from FASTA; added 4630 sequences in 0.287924 seconds.
+```
+
+This create the index for BLAST
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ ls
+amylase.Bgramini.fasta  Bacteroides51.faa.pdb  Bacteroides51.faa.pin  Bacteroides51.faa.psq  Bacteroides51.faa.pto
+Bacteroides51.faa       Bacteroides51.faa.phr  Bacteroides51.faa.pot  Bacteroides51.faa.ptf
+```
+
+And now lets run the BLAST,as we want to search for protein in a protein database the command we need to use is BLASTP:
+
+```
+
 
 
 
