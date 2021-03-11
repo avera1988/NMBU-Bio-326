@@ -928,7 +928,8 @@ For example the following job 12315677:
 
 To cancel just type:
 
-```[bio326-21-0@login bio326-21-0]$ scancel 12315677
+```
+[bio326-21-0@login bio326-21-0]$ scancel 12315677
 ```
 
 And then check for the status:
@@ -940,4 +941,13 @@ And then check for the status:
 
 If no slurm.out file is created and no job is showing by sque, it meand the job has been canceled.
 
+## Bulletpoints
 
+* Do not use the login node to run jobs.
+* Do not use the $HOME partition for lagre files storage.
+* Use interactive jobs for testing and debugging.
+* Use the $TMPDIR for faster computation
+* Delete intermediate results from the $SCRATCH.
+* Use sbatch command to submit you "final" jobs scripts.
+
+## Enjoy the Orion Cluster...
