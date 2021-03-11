@@ -580,7 +580,7 @@ Then let's sure this is copy back
 amylase.Bgramini.fasta.blastp.out
 ```
 
-Finaly as the **$TMPDIR** is used for everyone a best practice is to delete all the temporary directories (i.e work.directory) from this location.
+Finally, as the **$TMPDIR** is used for everyone a best practice is to delete all the temporary directories (i.e work.directory) from this location.
 
 We can achive this by doing this:
 
