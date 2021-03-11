@@ -940,10 +940,11 @@ If no slurm.out file is created and no job is showing by sque, it meand the job 
 
 ## Bulletpoints
 
-* Do not use the login node to run jobs.
+* Do not use the login node to run process (e.g. BLAST, SPADES, HMMER).
 * Do not use the $HOME partition for lagre files storage.
 * Use interactive jobs for testing and debugging.
-* Use the $TMPDIR for faster computation
+* Use the $TMPDIR for faster computation.
+* Monitoring your jobs by squeue.
 * Delete intermediate results from the $SCRATCH.
 * Use sbatch command to submit you "final" jobs scripts.
 
