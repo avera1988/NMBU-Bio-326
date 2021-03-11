@@ -613,7 +613,7 @@ exit
 
 You can see now we return to the main **login bio326-21-0** node.
 
-### Submit the same BLAST job but using a SLURM script.
+## Submit the same BLAST job but using a SLURM script.
 
 Most of the time you do not use the interactive way for submiting jobs into the cluster. To submit jobs, you need to write all the instructions you want the computer execute. This is what an script is.
 
