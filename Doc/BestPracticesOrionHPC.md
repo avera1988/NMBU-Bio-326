@@ -266,11 +266,9 @@ The easiest way to test software and to look into huhge files without messing th
 [bio326-21-0@login bio326-21-0]$ srun --cpus-per-task 4 --mem=4G --time=01:00:00 --pty bash -i
 srun: job 12314004 queued and waiting for resources
 ```
-*Explaining the command:
- srun <slurm-options> <software-name/path>
+*Basic syntaxis the command:
+ srun \<slurm-options> \<software-name/path>*
   
-
-
 It might take a while to SLURM allocate the resources of this job. But as soon as it allocates the job a message like this will be displayed:
 
 ```
