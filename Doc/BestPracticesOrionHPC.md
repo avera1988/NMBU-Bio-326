@@ -398,11 +398,11 @@ This is the sequence of an enzyme (a-amylase) of the bacteria Bacteroides fragil
 bash: blast: command not found
 ```
 
-It seems not to be installed in the defaiult.
+It seems not to be installed as a default software.
 
 ### Modules and singularity
 
-In order to use a software, we need to load the corresponding module first.The Modules package is a tool that simplifies shell initialization and lets users easily modify their environment during a session using modulefiles. You can read more about this on the [Environment Modules](https://modules.readthedocs.io/en/latest/) website.
+In order to use non default software (e.g BLAST, HMMER, SPADES), we need to load the corresponding module first.The Modules package is a tool that simplifies shell initialization and lets users easily modify their environment during a session using modulefiles. You can read more about this on the [Environment Modules](https://modules.readthedocs.io/en/latest/) website.
 
 The following commands let us manage modules in our workflow:
 
@@ -467,7 +467,9 @@ And then try the command:
 Illegal instruction
 ```
 
-As we can see in this node the blastp is not working. **Particularly in node cn-3 and cn-2, old nodes, module command shows multiple issues.** In that case we can use the singularity container. Singularity is a container platform. It allows you to create and run containers that package up pieces of software in a way that is portable and reproducible. Singularity can works in all nodes. Let's take a look:
+As we can see in this node the blastp is not working. **Particularly in node cn-3 and cn-2, old nodes, module command shows multiple issues.** In that case we can use the singularity container. Singularity is a container platform. It allows you to create and run containers that package up pieces of software in a way that is portable and reproducible. Singularity can works in all nodes. For more information please read the [Introduction to Singularity](https://sylabs.io/guides/3.7/user-guide/introduction.html) Read the Docs.
+
+Let's take a look into this singularity:
 
 First purge all modules:
 
@@ -545,6 +547,118 @@ Bacteroides51.faa       Bacteroides51.faa.phr  Bacteroides51.faa.pot  Bacteroide
 And now lets run the BLAST,as we want to search for protein in a protein database the command we need to use is BLASTP:
 
 ```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/l/blast:2.10.1--pl526he19e7b1_0 blastp -query amylase.Bgramini.fasta -db Bacteroides51.faa -dbsize 1000000000 -max_target_seqs 1 -outfmt 6 -num_threads $SLURM_CPUS_ON_NODE -out amylase.Bgramini.fasta.blastp.out
+WARNING: Skipping mount /var/singularity/mnt/session/etc/resolv.conf [files]: /etc/resolv.conf doesn't exist in container
+Warning: [blastp] Examining 5 or more matches is recommended
+```
+
+Take a look into the results:
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ more amylase.Bgramini.fasta.blastp.out 
+WP_024997086.1	D0T87_RS12665	57.772	772	301	13	8	763	28	790	0.0	908
+```
+
+It seems the amylase of B. fragilis has a match wiht the D0T87_RS12665 sequence of Bacteroides51. We can corroborate this by looking into the fasta file annotation header by doing something like this:
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ grep D0T87_RS12665 Bacteroides51.faa
+>D0T87_RS12665	alpha-amylase	WP_163175496.1
+```
+
+We found the amylase.
+
+### Copy results to the $SCRATCH, remove work.directory and exit the job.
+
+Finally we need to move the results back to our $SCRATCH partition. For this we can use the following sintax:
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ cp *fasta.blastp.out /mnt/SCRATCH/bio326-21-0
+```
+
+Then let's sure this is copy back
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ ls /mnt/SCRATCH/bio326-21-0
+amylase.Bgramini.fasta.blastp.out
+```
+
+Finaly as the **$TMPDIR** is used for everyone a best practice is to delete all the temporary directories (i.e work.directory) from this location.
+
+We can achive this by doing this:
+
+* First go back to the main $TMPDI/$USER
+
+```
+[bio326-21-0@cn-3 work.dir.of.12314866]$ cd $TMPDIR/$USER
+bio326-21-0@cn-3 bio326-21-0]$ ls
+singularity  work.dir.of.12314866
+```
+
+Now we need to remove the work.dir.of 
+
+```
+[bio326-21-0@cn-3 bio326-21-0]$ rm -rf work.dir.of.12314866/
+[bio326-21-0@cn-3 bio326-21-0]$ ls
+singularity
+```
+
+Finally, we can logout of this node:
+
+```
+[bio326-21-0@cn-3 bio326-21-0]$ exit
+exit
+[bio326-21-0@login bio326-21-0]$
+```
+
+You can see now we return to the main **login bio326-21-0** node.
+
+### Submit the same BLAST job but using a SLURM script.
+
+Most of the time you do not use the interactive way for submiting jobs into the cluster. To submit jobs, you need to write all the instructions you want the computer execute. This is what an script is.
+
+SLURM uses a [bash](https://www.gnu.org/software/bash/) (computer language) base script to read the instructions. The first lines, are reserved words that SLURM needs to read inorder to launch the program:
+
+```
+-p --partition <partition-name>       --pty <software-name/path>
+--mem <memory>                        --gres <general-resources>
+-n --ntasks <number of tasks>         -t --time <days-hours:minutes>
+-N --nodes <number-of-nodes>          -A --account <account>
+-c --cpus-per-task <number-of-cpus>   -L --licenses <license>
+-w --nodelist <list-of-node-names>    -J --job-name <jobname>
+```
+
+We can indicate this options by using the **#SBATCH** word following whit any of these flags.
+
+
+```
+#!/bin/bash
+
+## Job name:
+#SBATCH --job-name=Blast
+#
+## Wall time limit:
+#SBATCH --time=00:00:00
+#
+## Other parameters:
+#SBATCH --cpus-per-task 12
+#SBATCH --mem=60G
+#SBATCH --nodes 1
+```
+
+Let's use the following script to run the BLAST as we did in the interactive job.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
