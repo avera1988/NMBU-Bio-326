@@ -472,7 +472,7 @@ Let's take a look into this singularity:
 First purge all modules:
 
 ```
-[bio326-21-0@cn-3 ~]$ module purge[bio326-21-0@cn-3 ~]$ module purge
+[bio326-21-0@cn-3 ~]$ module purge
  ```
  
 This helps to not use the previous modules load (BLAST).
@@ -516,7 +516,6 @@ Protein-Protein BLAST 2.10.1+
 **The basic syntax for singularity is:  singularity [global options...] exec [exec options...] \<container> \<command>**
 
 All the containers are alphatetically sorted.
-
 
 Now we can run our BLAST search. First create a database using the Bacteroides51.faa file:
 
@@ -626,7 +625,7 @@ SLURM uses a [bash](https://www.gnu.org/software/bash/) (computer language) base
 -w --nodelist <list-of-node-names>    -J --job-name <jobname>
 ```
 
-We can indicate this options by using the **#SBATCH** word following whit any of these flags.
+We can indicate this options by using the **#SBATCH** word following by any of these flags.
 
 
 ```
@@ -644,7 +643,7 @@ We can indicate this options by using the **#SBATCH** word following whit any of
 #SBATCH --nodes 1
 ```
 
-Let's use the following script to run the BLAST as we did in the interactive job.
+Let's use the following SLURM script to run the BLAST as we did in the interactive job.
 
 
 ```
