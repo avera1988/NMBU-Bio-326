@@ -713,7 +713,7 @@ singularity exec /cvmfs/singularity.galaxyproject.org/b/l/blast:2.10.1--pl526he1
 
 echo "Copy data to the $SCRATCH ..." ##Legend to know what the job is doing
 
-cp *fasta.blastp.out /mnt/SCRATCH/bio326-21-0
+cp *fasta.blastp.out /mnt/SCRATCH/bio326-21-0  ##Remember to change the name of your user
 
 ###Remove the work.directory
 
