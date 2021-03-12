@@ -9,7 +9,7 @@ To login into Orin we need two things:
 For login just type something like this. 
 
 ```bash
-$ ssh bio326-21-0@login.nmbu.no
+$ ssh bio326-21-0@login.orion.nmbu.no
 ```
 *Remember to change to your username bio326-21-x*
 
