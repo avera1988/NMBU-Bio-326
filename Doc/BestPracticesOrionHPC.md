@@ -137,7 +137,7 @@ gn-2           1          gpu     drained 64     2:16:2 257710        0      1 c
 gn-2           1  interactive     drained 64     2:16:2 257710        0      1 cpu_amd, Kill task failed    
 gn-3           1          gpu       mixed 64     2:16:2 257710        0      1 cpu_amd, none   
 ```
-In this case the State column showed status of the node. It means, how many resources can be allocated per node, in this example there are 4 different status: 
+In this case, the State column showed the status of the node. It means, how many resources can be allocated per node, in this example there are 4 different status: 
 
 * allocated: The node has been allocated to one or more jobs.
 * completing* : All jobs associated with this node are in the process of COMPLETING. This node state will be removed when all of the job's processes have terminated
