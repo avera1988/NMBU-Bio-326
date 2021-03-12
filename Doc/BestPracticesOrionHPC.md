@@ -945,7 +945,7 @@ If no slurm.out file is created and no job is showing by sque, it meand the job 
 * Use interactive jobs for testing and debugging.
 * Use the $TMPDIR for faster computation.
 * Monitoring your jobs by squeue.
-* Delete intermediate results from the $SCRATCH.
-* Use sbatch command to submit you "final" jobs scripts.
+* Delete intermediate results from the $TMPDIR.
+* Use sbatch command to submit your "final" jobs scripts.
 
 ## Enjoy the Orion Cluster...
