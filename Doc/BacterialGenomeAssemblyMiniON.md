@@ -215,14 +215,14 @@ fastqfile=$(ls -l|grep fastq|awk '{print $9}')
 echo "Start CANU assembler at"
 date +%d\ %b\ %T ##Print the day and hour the assembly starts
 
-time canu \  #Name of the software
--d SalmonBacteria.canu.dir \  #Output directory
--p SalmonBacteria.canu \ #Prefix (name of files)
-useGrid=false \ #Do not use multiple nodes
-genomeSize=4m \ #Genome size in MegaBase pairs
-maxThreads=$SLURM_CPUS_ON_NODE \ #Number of CPUs
-maxMemory=20g \ #Max memorry allowed for computation
--nanopore-raw $fastqfile #input fastq files (reads)
+time canu \  
+-d SalmonBacteria.canu.dir \  
+-p SalmonBacteria.canu \ 
+useGrid=false \ 
+genomeSize=4m \
+maxThreads=$SLURM_CPUS_ON_NODE \ 
+maxMemory=20g \ 
+-nanopore-raw $fastqfile
 
 ###########Moving results #####################
 
@@ -242,6 +242,39 @@ echo "I've done at"
 date
 
 ```
-**You can either copy and pase this script into your terminal, or 
+**You can either copy and pase this script into your terminal, or copy the canu.SLURM.sh file from /mnt/SCRATCH/bio326-21/GenomeAssembly to your CANU.Assembly.dir folder**
 
- 
+```console
+[bio326-21-0@login CANU.Assembly.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/canu.SLURM.sh .
+[bio326-21-0@login CANU.Assembly.dir]$ ls
+canu.SLURM.sh  SalmonBacteria.total.fastq
+```
+- Submit the job into the Orion queue 
+
+```console
+[bio326-21-0@login CANU.Assembly.dir]$ sbatch canu.SLURM.sh
+Submitted batch job 12720147
+```
+
+- Monitoring the job
+
+```console
+[bio326-21-0@login CANU.Assembly.dir]$ squeue -u $USER
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON) 
+          12720147     orion     CANU bio326-2 PD       0:00      1 (Resources)
+[bio326-21-0@login CANU.Assembly.dir]$ squeue -u $USER
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON) 
+          12720147     orion     CANU bio326-2  R       0:07      1 cn-16 
+[bio326-21-0@login CANU.Assembly.dir]$ ls
+canu.SLURM.sh  SalmonBacteria.total.fastq  slurm-12720147.out
+```
+
+*The job is running it will take ~30 min to complete*
+
+
+ - Once CANU has finished it will produce XXX directory. Let's enter to this and take a look into the assembly:
+
+```console
+
+````
+
