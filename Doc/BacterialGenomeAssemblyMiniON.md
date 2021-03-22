@@ -3,7 +3,7 @@
  **After prepare the sequencing library and run it on a MiniON flowcell, [Guppy](https://nanoporetech.com/nanopore-sequencing-data-analysis) was used for basecalling. 
  A subset of six fastq files were obtained of this sequencing experiment. The following protocol describes the steps for assembly those reads into a bacterial genomes**
  
- ### Obtaining the fastq files
+ ## Obtaining the fastq files
  
  1. Loggin to Orion cluster
 
@@ -48,7 +48,7 @@ fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_0_0.fastq  fastq_runid_cbaf
 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_1_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_4_0.fastq
 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_2_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_5_0.fastq
 ```
-6. **As you notice there are six fastq files in this directory. It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
+6. As you notice there are six fastq files in this directory. **It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
 
 ```console
 [bio326-21-0@login SalmonBacteria.rawReads.subset]$ cat *.fastq > SalmonBacteria.total.fastq
@@ -68,7 +68,7 @@ total 398M
 -rw-rw-r-- 1 bio326-21-0 bio326-21-0 199M Mar 22 17:08 SalmonBacteria.total.fastq
 ```
 
-7. We can count the number of reads in this "big" concatenated file. For this we can count the number of lines of the file and divide by the four canonical elements in a fastq file: 
+7. We can count the number of reads in this "big" concatenated file. For this we can count the number of lines in the file and divide them by four ( the number of canonical elements in a fastq file)...
 
 ```
 A FASTQ file normally uses four lines per sequence.
@@ -85,13 +85,166 @@ Let's do it:
 24000
 ```
 
-*Command line explained: first, we count all the lines (wc -l) of the SalmonBacteria.total.fastq file and storage into a variable ($). Then, we divided that variable \[echo $(wc -l < SalmonBacteria.total.fastq)\] by four, and in order the computer will be able to print the result we call the command bc (Basic calculator).*
+*Command line explained: first, we count all the lines (wc -l) of the SalmonBacteria.total.fastq file and storage into a variable ($). Then, we divided that variable \[echo $(wc -l < SalmonBacteria.total.fastq)\] by four, and in order to the computer be able to print the result we call the command bc (Basic calculator).*
 
-We have a total of 24,000 reads in the file.
+Acording to this results, we have a total of 24,000 reads in the file concatenated file.
+
+## Assembly raw-reads into a genome (genomic contigs) using CANU assembler ###
+
+**To recover the bacterial genome from these reads, we first need to assembly the reads into either the complete bacterial chromosome or contigs and try polish them into a final assembly. There are several bioinformatic tools (assemblers) we can used, however, in this protocol we first use [CANU](https://github.com/marbl/canu) and then try to polish (improve the assembly) with two polishing tools: [Racon](https://github.com/isovic/racon) and [Medaka](https://github.com/nanoporetech/medaka).** 
+
+### Running CANU
+
+Let's check the options on CANU assembler to know what elements do we need:
+
+- Fisrt, load the module CANU form in Orion. 
+
+```console 
+[bio326-21-0@login CANU.Assembly.dir]$ module load canu/1.9-GCCcore-8.3.0-Java-11
+```
+
+- Then display the CANU's help
+
+```console
+[bio326-21-0@login CANU.Assembly.dir]$ canu --help
+
+usage:   canu [-version] [-citation] \
+              [-haplotype | -correct | -trim | -assemble | -trim-assemble] \
+              [-s <assembly-specifications-file>] \
+               -p <assembly-prefix> \
+               -d <assembly-directory> \
+               genomeSize=<number>[g|m|k] \
+              [other-options] \
+              [-haplotype{NAME} illumina.fastq.gz] \
+              [-pacbio-raw |
+               -pacbio-corrected |
+               -nanopore-raw |
+               -nanopore-corrected |
+               -pacbio-hifi] file1 file2 ...
+
+example: canu -d run1 -p godzilla genomeSize=1g -nanopore-raw reads/*.fasta.gz 
+```
+
+The help displays that we need to feed CANU with: the reads (fastq files), an output directory, a prefix (name for the files will create), the genomeSize (in this case ~4Mb) of the organism we are working on and the type of sequences (nanopore-raw). 
+
+- As we cover all these requirements, now we can start the assembly. 
+
+- Enter to the $SCRATCH/GenomeAssemblyBio326 folder (previously created), and make a directory named CANU.Assembly.dir
+
+```console
+[bio326-21-0@login ~]$ cd $SCRATCH/GenomeAssemblyBio326 
+[bio326-21-0@login GenomeAssemblyBio326]$ mkdir CANU.Assembly.dir
+[bio326-21-0@login GenomeAssemblyBio326]$ ls
+CANU.Assembly.dir  SalmonBacteria.rawReads.subset  SalmonBacteria.rawReads.subset.tar.gz
+```
+- Enter to the CANU.Assembly.dir folder and copy the concatenated **SalmonBacteria.total.fastq** previously obtained (storaged in $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset)
+
+```console
+[bio326-21-0@login GenomeAssemblyBio326]$ cd CANU.Assembly.dir/
+[bio326-21-0@login CANU.Assembly.dir]$ cp $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/SalmonBacteria.total.fastq .
+[bio326-21-0@login CANU.Assembly.dir]$ ls
+SalmonBacteria.total.fastq
+
+- Finally, Let's use the following SLURM script to queue or job into the cluster. 
+
+```bash
+
+#!/bin/bash
+
+## Job name:
+#SBATCH --job-name=CANU
+#
+## Wall time limit:
+#SBATCH --time=72:00:00
+#
+## Other parameters:
+#SBATCH --cpus-per-task 16
+#SBATCH --mem=20G
+#SBATCH --nodes 1
 
 
+## Set up job environment:
+#set -o errexit  # Exit the script on any error
+#set -o nounset  # Treat any unset variables as an error
+
+module --quiet purge  # Reset the modules to the system default
+module load canu/1.9-GCCcore-8.3.0-Java-11
+
+##Activate conda environments
+
+export PS1=\$
+echo "I am working with this CONDA enviroment loaded"
+echo $CONDA_PREFIX
 
 
+####Do some work:########
 
+## For debuggin
+echo "Hello" $USER
+echo "my submit directory is:"
+echo $SLURM_SUBMIT_DIR
+echo "this is the job:"
+echo $SLURM_JOB_ID
+echo "I am running on:"
+echo $SLURM_NODELIST
+echo "I am running with:"
+echo $SLURM_CPUS_ON_NODE "cpus"
+echo "Today is:"
+date
+
+## Copying data to local node for faster computation
+
+cd $TMPDIR
+
+#Check if $USER exists in $TMPDIR  ##This if loop checks tha the $USER exist in the $TMPDIR if not automatically create this.
+
+if [[ -d $USER ]]
+	then
+        	echo "$USER exists on $TMPDIR"
+	else
+        	mkdir $USER
+fi
+
+echo "copying files to $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID"
+
+cd $USER
+mkdir tmpDir_of.$SLURM_JOB_ID
+cd tmpDir_of.$SLURM_JOB_ID
+
+cp $SLURM_SUBMIT_DIR/*.fastq .
+
+fastqfile=$(ls -l|grep fastq|awk '{print $9}') ## A variable to with the name of the fastqfile
+
+####CANU#####
+
+time canu \
+-d SCA41.A.subset.canu.dir \
+-p SCA4.1A.subset \
+useGrid=false \
+genomeSize=4m \
+maxThreads=$SLURM_CPUS_ON_NODE \  #Use the number of CPUs requested in the job
+maxMemory=20g \
+-nanopore-raw $fastqfile
+
+###########Moving results #####################
+
+echo "moving results to" $SLURM_SUBMIT_DIR/
+
+rm *.fastq
+
+time cp -r * $SLURM_SUBMIT_DIR/
+
+#removing tmp dir
+
+cd $TMPDIR/$USER/
+
+rm -r tmpDir_of.$SLURM_JOB_ID
+
+echo "I've done at"
+date
+
+```
+
+-
 
  
