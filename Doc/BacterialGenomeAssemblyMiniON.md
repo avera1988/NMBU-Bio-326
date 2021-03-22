@@ -7,17 +7,17 @@
  
  1. Loggin to Orion cluster
 
-```bash
+```console
 ssh bio326-21-0@login.orion.nmbu.no
 ```
 
 2. Go to the $SCRATCH folder. 
-```bash
+```console
 [bio326-21-0@login ~]$ cd $SCRATCH/
 ```
 3. Create a directory named GenomeAssemblyBio326 and copy from (/mnt/SCRATCH/bio326-21/GenomeAssembly/) the tarball (SalmonBacteria.rawReads.subset.tar.gz) with the fastq files to your $SCRATCH/GenomeAssemblyBio326 directory.
 
-```bash
+```console
 [bio326-21-0@login bio326-21-0]$ mkdir GenomeAssemblyBio326
 [bio326-21-0@login bio326-21-0]$ cd GenomeAssemblyBio326/
 [bio326-21-0@login GenomeAssemblyBio326]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/SalmonBacteria.rawReads.subset.tar.gz .
@@ -28,7 +28,7 @@ SalmonBacteria.rawReads.subset.tar.gz
 
 4. Decompress the tarball to access the files. For this, we can use the command tar and the options -x (decompress) z (gzip file) v (verbose or print the results) f (file).
 
-```bash
+```console
 [bio326-21-0@login GenomeAssemblyBio326]$ tar -xzvf SalmonBacteria.rawReads.subset.tar.gz
 SalmonBacteria.rawReads.subset/
 SalmonBacteria.rawReads.subset/fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_0_0.fastq
@@ -41,22 +41,22 @@ SalmonBacteria.rawReads.subset/fastq_runid_cbaffd65431ed3590f2402612142061571365
 
 5. Enter to the SalmonBacteria.rawReads.subset directory and take a look:
 
-```bash
+```console
 [bio326-21-0@login GenomeAssemblyBio326]$ cd SalmonBacteria.rawReads.subset
 [bio326-21-0@login SalmonBacteria.rawReads.subset]$ ls
 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_0_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_3_0.fastq
 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_1_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_4_0.fastq
 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_2_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_5_0.fastq
 ```
-**As you notice there are six fastq files in this directory. It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
+6. **As you notice there are six fastq files in this directory. It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
 
-```bash
+```console
 [bio326-21-0@login SalmonBacteria.rawReads.subset]$ cat *.fastq > SalmonBacteria.total.fastq
 ```
 
 Now you will have a "big" (> 100 Mb) fastq file (SalmonBacteria.total.fastq) with all the sequenced reads:
 
-```bash
+```console
 [bio326-21-0@login SalmonBacteria.rawReads.subset]$ ls -lrth
 total 398M
 -rwxrwxr-x 1 bio326-21-0 bio326-21-0  32M Mar 22 16:17 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_1_0.fastq
@@ -68,7 +68,7 @@ total 398M
 -rw-rw-r-- 1 bio326-21-0 bio326-21-0 199M Mar 22 17:08 SalmonBacteria.total.fastq
 ```
 
-We can count the number of reads in this "big" concatenated file. For this we can count the number of lines of the file and divide by four. Why by four? 
+7. We can count the number of reads in this "big" concatenated file. For this we can count the number of lines of the file and divide by the four canonical elements in a fastq file: 
 
 ```
 A FASTQ file normally uses four lines per sequence.
@@ -78,6 +78,18 @@ Line 2 is the raw sequence letters.
 Line 3 begins with a '+' character and is optionally followed by the same sequence identifier (and any description) again.
 Line 4 encodes the quality values for the sequence in Line 2, and must contain the same number of symbols as letters in the sequence.
 ```
+Let's do it:
+
+```console
+[bio326-21-0@login SalmonBacteria.rawReads.subset]$ echo $(wc -l < SalmonBacteria.total.fastq)/4|bc
+24000
+```
+
+*Command line explained: first, we count all the lines (wc -l) of the SalmonBacteria.total.fastq file and storage into a variable ($). Then, we divided that variable \[echo $(wc -l < SalmonBacteria.total.fastq)\] by four, and in order the computer will be able to print the result we call the command bc (Basic calculator).*
+
+We have a total of 24,000 reads in the file.
+
+
 
 
 
