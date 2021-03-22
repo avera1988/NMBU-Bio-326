@@ -215,22 +215,22 @@ fastqfile=$(ls -l|grep fastq|awk '{print $9}')
 echo "Start CANU assembler at"
 date +%d\ %b\ %T ##Print the day and hour the assembly starts
 
-time canu \
--d SCA41.A.subset.canu.dir \
--p SCA4.1A.subset \
-useGrid=false \
-genomeSize=4m \
-maxThreads=$SLURM_CPUS_ON_NODE \
-maxMemory=20g \
--nanopore-raw $fastqfile
+time canu \  #Name of the software
+-d SalmonBacteria.canu.dir \  #Output directory
+-p SalmonBacteria.canu \ #Prefix (name of files)
+useGrid=false \ #Do not use multiple nodes
+genomeSize=4m \ #Genome size in MegaBase pairs
+maxThreads=$SLURM_CPUS_ON_NODE \ #Number of CPUs
+maxMemory=20g \ #Max memorry allowed for computation
+-nanopore-raw $fastqfile #input fastq files (reads)
 
 ###########Moving results #####################
 
 echo "moving results to" $SLURM_SUBMIT_DIR/
 
-rm *.fastq
+rm *.fastq #Remove fastq files
 
-time cp -r * $SLURM_SUBMIT_DIR/
+time cp -r * $SLURM_SUBMIT_DIR/  #Copy all results to the submit directory
 
 ####Removing tmp dir#####
 
@@ -240,7 +240,6 @@ rm -r tmpDir_of.$SLURM_JOB_ID
 
 echo "I've done at"
 date
-
 
 ```
 **You can either copy and pase this script into your terminal, or 
