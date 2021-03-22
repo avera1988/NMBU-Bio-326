@@ -144,6 +144,7 @@ CANU.Assembly.dir  SalmonBacteria.rawReads.subset  SalmonBacteria.rawReads.subse
 [bio326-21-0@login CANU.Assembly.dir]$ cp $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/SalmonBacteria.total.fastq .
 [bio326-21-0@login CANU.Assembly.dir]$ ls
 SalmonBacteria.total.fastq
+```
 
 - Finally, Let's use the following SLURM script to queue or job into the cluster. 
 
@@ -162,24 +163,18 @@ SalmonBacteria.total.fastq
 #SBATCH --mem=20G
 #SBATCH --nodes 1
 
-
 ## Set up job environment:
-#set -o errexit  # Exit the script on any error
-#set -o nounset  # Treat any unset variables as an error
 
 module --quiet purge  # Reset the modules to the system default
-module load canu/1.9-GCCcore-8.3.0-Java-11
+module load canu/1.9-GCCcore-8.3.0-Java-11 ##Load the canu module
 
 ##Activate conda environments
 
 export PS1=\$
-echo "I am working with this CONDA enviroment loaded"
-echo $CONDA_PREFIX
-
 
 ####Do some work:########
 
-## For debuggin
+## For debuggin it is useful to print some info about the node,CPUs requested and when the job starts...
 echo "Hello" $USER
 echo "my submit directory is:"
 echo $SLURM_SUBMIT_DIR
@@ -196,7 +191,7 @@ date
 
 cd $TMPDIR
 
-#Check if $USER exists in $TMPDIR  ##This if loop checks tha the $USER exist in the $TMPDIR if not automatically create this.
+#Check if $USER exists in $TMPDIR
 
 if [[ -d $USER ]]
 	then
@@ -211,18 +206,21 @@ cd $USER
 mkdir tmpDir_of.$SLURM_JOB_ID
 cd tmpDir_of.$SLURM_JOB_ID
 
-cp $SLURM_SUBMIT_DIR/*.fastq .
+cp $SLURM_SUBMIT_DIR/$inputdir/*.fastq .
 
-fastqfile=$(ls -l|grep fastq|awk '{print $9}') ## A variable to with the name of the fastqfile
+fastqfile=$(ls -l|grep fastq|awk '{print $9}')
 
 ####CANU#####
+
+echo "Start CANU assembler at"
+date +%d\ %b\ %T ##Print the day and hour the assembly starts
 
 time canu \
 -d SCA41.A.subset.canu.dir \
 -p SCA4.1A.subset \
 useGrid=false \
 genomeSize=4m \
-maxThreads=$SLURM_CPUS_ON_NODE \  #Use the number of CPUs requested in the job
+maxThreads=$SLURM_CPUS_ON_NODE \
 maxMemory=20g \
 -nanopore-raw $fastqfile
 
@@ -234,7 +232,7 @@ rm *.fastq
 
 time cp -r * $SLURM_SUBMIT_DIR/
 
-#removing tmp dir
+####Removing tmp dir#####
 
 cd $TMPDIR/$USER/
 
@@ -243,8 +241,8 @@ rm -r tmpDir_of.$SLURM_JOB_ID
 echo "I've done at"
 date
 
-```
 
--
+```
+**You can either copy and pase this script into your terminal, or 
 
  
