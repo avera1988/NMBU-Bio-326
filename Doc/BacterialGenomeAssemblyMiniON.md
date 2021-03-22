@@ -146,7 +146,7 @@ CANU.Assembly.dir  SalmonBacteria.rawReads.subset  SalmonBacteria.rawReads.subse
 SalmonBacteria.total.fastq
 ```
 
-- Finally, Let's use the following SLURM script to queue or job into the cluster. 
+- Finally, Let's use the following SLURM script to queue our job into the cluster. 
 
 ```bash
 
@@ -242,7 +242,7 @@ echo "I've done at"
 date
 
 ```
-**You can either copy and pase this script into your terminal, or copy the canu.SLURM.sh file from /mnt/SCRATCH/bio326-21/GenomeAssembly to your CANU.Assembly.dir folder**
+**You can either copy and paste this script into your terminal, or copy the canu.SLURM.sh file from /mnt/SCRATCH/bio326-21/GenomeAssembly to your CANU.Assembly.dir folder**
 
 ```console
 [bio326-21-0@login CANU.Assembly.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/canu.SLURM.sh .
