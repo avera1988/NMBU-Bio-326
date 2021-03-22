@@ -269,12 +269,18 @@ Submitted batch job 12720147
 canu.SLURM.sh  SalmonBacteria.total.fastq  slurm-12720147.out
 ```
 
-*The job is running it will take ~30 min to complete*
+*The job is running it will take ~40 min to complete. If your have troubles to run the job, there is a copy of * 
 
 
- - Once CANU has finished it will produce XXX directory. Let's enter to this and take a look into the assembly:
+ - Once CANU has finished it will produce the **SalmonBacteria.canu.dir** directory. Let's enter to this and take a look into the assembly:
 
 ```console
-
+[bio326-21-0@login CANU.Assembly.dir]$ cd SalmonBacteria.canu.dir/
+[bio326-21-0@login SalmonBacteria.canu.dir]$ ls
+canu-logs                           SalmonBacteria.canu.contigs.layout.readToTig  SalmonBacteria.canu.seqStore.err           SalmonBacteria.canu.unitigs.fasta             trimming
+canu-scripts                        SalmonBacteria.canu.contigs.layout.tigInfo    SalmonBacteria.canu.seqStore.ssi           SalmonBacteria.canu.unitigs.gfa               unitigging
+correction                          SalmonBacteria.canu.correctedReads.fasta.gz   SalmonBacteria.canu.trimmedReads.fasta.gz  SalmonBacteria.canu.unitigs.layout
+SalmonBacteria.canu.contigs.fasta   SalmonBacteria.canu.report                    SalmonBacteria.canu.unassembled.fasta      SalmonBacteria.canu.unitigs.layout.readToTig
+SalmonBacteria.canu.contigs.layout  SalmonBacteria.canu.seqStore                  SalmonBacteria.canu.unitigs.bed            SalmonBacteria.canu.unitigs.layout.tigInfo****
 ````
 
