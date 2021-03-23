@@ -712,7 +712,7 @@ Submitted batch job 12720972
 
 - After finishig, the job will create a **Salmon.bacteria.busco** directory. Let's enter to it and take a look:
 
-*If your job has not started, it is taking a long time in the queue or proudce any error, you can find the results of the BUSCO analysis in the /mnt/SCRATCH/bio326-21/GenomeAssembly/Salmon.bacteria.busco folder, just copy and paste this folder to your $SCRATCH/GenomeAssembly/SalmonBacteria.canu.dir folder by:
+*If your job has not started, it is taking a long time in the queue or proudce any error, you can find the results of the BUSCO analysis in the /mnt/SCRATCH/bio326-21/GenomeAssembly/Salmon.bacteria.busco folder, just copy and paste this folder to your $SCRATCH/GenomeAssembly/SalmonBacteria.canu.dir folder by:*
 
 ```bash
 cp -r /mnt/SCRATCH/bio326-21/GenomeAssembly/Salmon.bacteria.busco $SCRATCH/GenomeAssemblyBio326/CANU.Assembly.dir/SalmonBacteria.canu.dir
