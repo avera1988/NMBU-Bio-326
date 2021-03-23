@@ -198,7 +198,7 @@ drwxrwxr-x 2 bio326-21-0 bio326-21-0 4.0K Mar 23 12:53 summary-plots-log-transfo
 
 ```
 
-7. As a control steep and to know if we have the same ammount of sequences (24,000) we got in the summary file in the new concatenated file, we can count the number of reads in this "big" file. For this we can count the number of lines in the file and divide them by four (the number of canonical elements in a fastq file)...
+7. As a control steep and to know if we have the same ammount of sequences (24,000) we got in the summary file in the new concatenated file, we need to count the number of reads in this "big" file. For this we can count the number of lines in the file and divide them by four (the number of canonical elements in a fastq file)...
 
 ```
 A FASTQ file normally uses four lines per sequence.
