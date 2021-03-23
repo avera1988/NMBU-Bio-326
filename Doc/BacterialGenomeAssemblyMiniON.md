@@ -421,3 +421,4 @@ SalmonBacteria.canu.contigs.layout  SalmonBacteria.canu.seqStore                
 ````
 
 - To understand the results, let's take a look into the main [CANU]() pipeline ![canu pipeline](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-pipeline.svg)
+![canu overlap](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-overlaps.svg)
