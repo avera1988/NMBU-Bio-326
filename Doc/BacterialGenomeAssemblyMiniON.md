@@ -719,7 +719,8 @@ cp -r /mnt/SCRATCH/bio326-21/GenomeAssembly/Salmon.bacteria.busco $SCRATCH/Genom
 ```
 
 ```console
-bio326-21-0@cn-4 Salmon.bacteria.busco]$ ls
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ cd Salmon.bacteria.busco/
+[bio326-21-0@cn-4 Salmon.bacteria.busco]$ ls
 auto_lineage  prodigal_output     run_pseudomonadales_odb10                                       short_summary.specific.pseudomonadales_odb10.Salmon.bacteria.busco.txt
 logs          run_bacteria_odb10  short_summary.generic.bacteria_odb10.Salmon.bacteria.busco.txt
 ```
