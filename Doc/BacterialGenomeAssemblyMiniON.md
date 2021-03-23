@@ -419,3 +419,5 @@ correction                          SalmonBacteria.canu.correctedReads.fasta.gz 
 SalmonBacteria.canu.contigs.fasta   SalmonBacteria.canu.report                    SalmonBacteria.canu.unassembled.fasta      SalmonBacteria.canu.unitigs.layout.readToTig
 SalmonBacteria.canu.contigs.layout  SalmonBacteria.canu.seqStore                  SalmonBacteria.canu.unitigs.bed            SalmonBacteria.canu.unitigs.layout.tigInfo
 ````
+
+- To understand the results, let's take a look into the main [CANU]() pipeline ![canu pipeline](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-pipeline.svg)
