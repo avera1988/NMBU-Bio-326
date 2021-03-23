@@ -15,7 +15,7 @@ ssh bio326-21-0@login.orion.nmbu.no
 ```console
 [bio326-21-0@login ~]$ cd $SCRATCH/
 ```
-3. Create a directory named GenomeAssemblyBio326 and copy from (/mnt/SCRATCH/bio326-21/GenomeAssembly/) the tarball (SalmonBacteria.rawReads.subset.tar.gz) with the fastq files to your $SCRATCH/GenomeAssemblyBio326 directory.
+3. Create a directory named GenomeAssemblyBio326 and copy from (/mnt/SCRATCH/bio326-21/GenomeAssembly/) the tarball (SalmonBacteria.rawReads.subset.tar.gz) with the fastq files and the sequencing_summary.txt file to your $SCRATCH/GenomeAssemblyBio326 directory.
 
 ```console
 [bio326-21-0@login bio326-21-0]$ mkdir GenomeAssemblyBio326
@@ -37,38 +37,168 @@ SalmonBacteria.rawReads.subset/fastq_runid_cbaffd65431ed3590f2402612142061571365
 SalmonBacteria.rawReads.subset/fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_3_0.fastq
 SalmonBacteria.rawReads.subset/fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_4_0.fastq
 SalmonBacteria.rawReads.subset/fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_5_0.fastq
+SalmonBacteria.rawReads.subset/sequencing_summary.txt
 ```
 
 5. Enter to the SalmonBacteria.rawReads.subset directory and take a look:
 
 ```console
 [bio326-21-0@login GenomeAssemblyBio326]$ cd SalmonBacteria.rawReads.subset
-[bio326-21-0@login SalmonBacteria.rawReads.subset]$ ls
-fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_0_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_3_0.fastq
-fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_1_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_4_0.fastq
-fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_2_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_5_0.fastq
+
 ```
-6. As you notice there are six fastq files in this directory. **It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
+
+6. Get basic stats and quality plots of the readas in the fastq files using the [NanoPlot](https://github.com/wdecoster/NanoPlot) pipeline:
+
+- **As we are doing some computing work, let's log into a interactive node requesting few resources (i.e. 4G RAM, 2 CPUS for 2 hrs):**
 
 ```console
-[bio326-21-0@login SalmonBacteria.rawReads.subset]$ cat *.fastq > SalmonBacteria.total.fastq
+(/mnt/users/auve/mycondaenvs/HTOP) [bio326-21-0@login GenomeAssemblyBio326]$ srun --cpus-per-task 2 --mem=4G --time=02:00:00 --pty bash -i
+srun: job 12720658 queued and waiting for resources
+srun: job 12720658 has been allocated resources
+
+Welcome to the NMBU Orion compute cluster environment.
+
+You are logged in to a machine that can be used to access your home directory,
+edit your scripts, manage your files, and submit jobs to the cluster environment.
+Do not run any jobs on this machine, as they might be automatically terminated.
+
+IMPORTANT:
+  - Orion introduction: https://orion.nmbu.no/
+  - Orion can handle small-scale projects. Need more CPU hours? Please consider
+    applying for national infrastructure resources: https://www.sigma2.no/
+  - Please, PLEASE do compress your fastq, vcf and other non-compressed files
+    using i.e. pigz.
+
+NEWS:
+  - 2020-10-08: Orion has been re-built. We are still working out many details.
+    Please email us if you miss anything, or notice any issues.
+
+For any Orion related enquiry: orion-support@nmbu.no
+PS: We are on Teams: https://bit.ly/orion-teams
+
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$
+```
+- For this protocol the NanoPlot pipeline is installed in a conda-environment (/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools). For this, you first need to load the module Miniconda3 and then activate the condaenvironment:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ module load Miniconda3
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-4 GenomeAssemblyBio326]$
+```
+*If you now see that your prompt has changed with the legend "(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools)" means the conda env has been properly load*
+
+- Now let's call the program NanoPlot and see the options.
+
+```console
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ NanoPlot --help
+usage: NanoPlot [-h] [-v] [-t THREADS] [--verbose] [--store] [--raw] [--huge]
+                [-o OUTDIR] [-p PREFIX] [--tsv_stats] [--maxlength N]
+                [--minlength N] [--drop_outliers] [--downsample N]
+                [--loglength] [--percentqual] [--alength] [--minqual N]
+                [--runtime_until N] [--readtype {1D,2D,1D2}] [--barcoded]
+                [--no_supplementary] [-c COLOR] [-cm COLORMAP]
+                [-f {eps,jpeg,jpg,pdf,pgf,png,ps,raw,rgba,svg,svgz,tif,tiff}]
+                [--plots [{kde,hex,dot,pauvre} [{kde,hex,dot,pauvre} ...]]]
+                [--listcolors] [--listcolormaps] [--no-N50] [--N50]
+                [--title TITLE] [--font_scale FONT_SCALE] [--dpi DPI]
+                [--hide_stats]
+                (--fastq file [file ...] | --fasta file [file ...] | --fastq_rich file [file ...] | --fastq_minimal file [file ...] | --summary file [file ...] | --bam file [file ...] | --ubam file [file ...] | --cram file [file ...] | --pickle pickle | --feather file [file ...])
+
+CREATES VARIOUS PLOTS FOR LONG READ SEQUENCING DATA.
+```
+- We can use either the summary file, fastqfiles or some mappped bam files. For now as we have the sequencing_summary.txt file, let's use this:
+
+```console
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ NanoPlot --summary sequencing_summary.txt --loglength -o summary-plots-log-transformed
+/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools/lib/python3.6/_collections_abc.py:702: MatplotlibDeprecationWarning:
+
+The global colormaps dictionary is no longer considered public API.
+
+/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools/lib/python3.6/_collections_abc.py:720: MatplotlibDeprecationWarning:
+
+The global colormaps dictionary is no longer considered public API.
+```
+- Although the software display some "warnings" it seems finished without error and produced the summary-plots-log-transformed folder:
+
+```console
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ ls
+fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_0_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_3_0.fastq  sequencing_summary.txt
+fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_1_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_4_0.fastq  summary-plots-log-transformed
+fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_2_0.fastq  fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_5_0.fastq
+```
+
+- Enter to this folder and look the results:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ cd summary-plots-log-transformed/
+[bio326-21-0@cn-4 summary-plots-log-transformed]$ ls
+ActivePores_Over_Time.png              LengthvsQualityScatterPlot_dot.png            NanoPlot-report.html         TimeSequencingSpeed_ViolinPlot.png
+ActivityMap_ReadsPerChannel.png        LengthvsQualityScatterPlot_kde.png            NanoStats.txt                Weighted_HistogramReadlength.png
+CumulativeYieldPlot_Gigabases.png      LengthvsQualityScatterPlot_loglength_dot.png  NumberOfReads_Over_Time.png  Weighted_LogTransformed_HistogramReadlength.png
+CumulativeYieldPlot_NumberOfReads.png  LengthvsQualityScatterPlot_loglength_kde.png  TimeLengthViolinPlot.png     Yield_By_Length.png
+Dynamic_Histogram_Read_length.html     LogTransformed_HistogramReadlength.png        TimeLogLengthViolinPlot.png
+HistogramReadlength.png                NanoPlot_20210323_1252.log                    TimeQualityViolinPlot.png
+```
+- The pipeline produced multiple plots (png files), an html report (NanoPlot-report.html) and a text file (NanoStats.txt) with the Nanopore reads statistics. To visualize the png and html you need to copy your files to your compuer or use the GUI [Orion Jupyter hub](https://orion.nmbu.no/jupyter) to access this. However, we can take a quick view of the stats report in the text file **NanoStats.txt**.
+
+```console
+[bio326-21-0@cn-4 summary-plots-log-transformed]$ more NanoStats.txt 
+General summary:         
+Active channels:                   109.0
+Mean read length:                4,266.4
+Mean read quality:                   9.8
+Median read length:              2,275.5
+Median read quality:                10.0
+Number of reads:                24,000.0
+Read length N50:                 8,318.0
+STDEV read length:               5,682.0
+Total bases:               102,392,823.0
+Number, percentage and megabases of reads above quality cutoffs
+>Q5:	23996 (100.0%) 102.4Mb
+>Q7:	22344 (93.1%) 96.3Mb
+>Q10:	11983 (49.9%) 52.9Mb
+>Q12:	1329 (5.5%) 4.7Mb
+>Q15:	0 (0.0%) 0.0Mb
+Top 5 highest mean basecall quality scores and their read lengths
+1:	14.0 (772)
+2:	13.9 (962)
+3:	13.8 (1027)
+4:	13.7 (506)
+5:	13.6 (521)
+Top 5 longest reads and their mean basecall quality score
+1:	117332 (11.2)
+2:	82149 (9.0)
+3:	68986 (7.2)
+4:	66931 (7.9)
+5:	63998 (8.2)
+```
+ **After this, we know that we got a total of 24,000 reads from the MiniON sequencing experiment, with an average read lenght of 4,266 nucleotides (nt) and the largest read has a lenght of 117,332 nt. We then can continue with the assembly...**
+ 
+6. As you notice there are six fastq files in the SalmonBacteria.rawReads.subset directory. **It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
+
+```console
+[bio326-21-0@cn-4 summary-plots-log-transformed]$ cd $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ cat *.fastq > SalmonBacteria.total.fastq
 ```
 
 Now you will have a "big" (> 100 Mb) fastq file (SalmonBacteria.total.fastq) with all the sequenced reads:
 
 ```console
-[bio326-21-0@login SalmonBacteria.rawReads.subset]$ ls -lrth
-total 398M
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ ls -lrth
+total 404M
 -rwxrwxr-x 1 bio326-21-0 bio326-21-0  32M Mar 22 16:17 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_1_0.fastq
 -rwxrwxr-x 1 bio326-21-0 bio326-21-0  32M Mar 22 16:17 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_0_0.fastq
 -rwxrwxr-x 1 bio326-21-0 bio326-21-0  37M Mar 22 16:17 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_5_0.fastq
 -rwxrwxr-x 1 bio326-21-0 bio326-21-0  35M Mar 22 16:17 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_4_0.fastq
 -rwxrwxr-x 1 bio326-21-0 bio326-21-0  34M Mar 22 16:17 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_3_0.fastq
 -rwxrwxr-x 1 bio326-21-0 bio326-21-0  32M Mar 22 16:17 fastq_runid_cbaffd65431ed3590f2402612142061571365f8a_2_0.fastq
--rw-rw-r-- 1 bio326-21-0 bio326-21-0 199M Mar 22 17:08 SalmonBacteria.total.fastq
+-rwxrwxr-x 1 bio326-21-0 bio326-21-0 5.6M Mar 23 11:35 sequencing_summary.txt
+drwxrwxr-x 2 bio326-21-0 bio326-21-0 4.0K Mar 23 12:53 summary-plots-log-transformed
+-rw-rw-r-- 1 bio326-21-0 bio326-21-0 199M Mar 23 13:18 SalmonBacteria.total.fastq
+
 ```
 
-7. We can count the number of reads in this "big" concatenated file. For this we can count the number of lines in the file and divide them by four ( the number of canonical elements in a fastq file)...
+7. We can count the number of reads in this "big" concatenated file. For this we can count the number of lines in the file and divide them by four (the number of canonical elements in a fastq file)...
 
 ```
 A FASTQ file normally uses four lines per sequence.
@@ -81,13 +211,13 @@ Line 4 encodes the quality values for the sequence in Line 2, and must contain t
 Let's do it:
 
 ```console
-[bio326-21-0@login SalmonBacteria.rawReads.subset]$ echo $(wc -l < SalmonBacteria.total.fastq)/4|bc
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ echo $(wc -l < SalmonBacteria.total.fastq)/4|bc
 24000
 ```
 
 *Command line explained: first, we count all the lines (wc -l) of the SalmonBacteria.total.fastq file and storage into a variable ($). Then, we divided that variable \[echo $(wc -l < SalmonBacteria.total.fastq)\] by four, and in order to the computer be able to print the result we call the command bc (Basic calculator).*
 
-Acording to this results, we have a total of 24,000 reads in the file concatenated file.
+Acording to this results, we have a total of 24,000 reads in the file concatenated file, that is the same number of reads we got in the summary stats. This is a good quality control steep.
 
 ## Assembly raw-reads into a genome (genomic contigs) using CANU assembler ###
 
@@ -97,16 +227,17 @@ Acording to this results, we have a total of 24,000 reads in the file concatenat
 
 Let's check the options on CANU assembler to know what elements do we need:
 
-- Fisrt, load the module CANU form in Orion. 
+- Fisrt, go back to the GenomeAssemblyBio326 folder and  load the module CANU form in Orion. 
 
 ```console 
-[bio326-21-0@login CANU.Assembly.dir]$ module load canu/1.9-GCCcore-8.3.0-Java-11
+[bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ cd $SCRATCH/GenomeAssemblyBio326
+[bio326-21-0@cn-4 GenomeAssemblyBio326]$ module load canu/1.9-GCCcore-8.3.0-Java-11
 ```
 
 - Then display the CANU's help
 
 ```console
-[bio326-21-0@login CANU.Assembly.dir]$ canu --help
+[bio326-21-0@cn-4 GenomeAssemblyBio326]$ module load canu/1.9-GCCcore-8.3.0-Java-11 canu --help
 
 usage:   canu [-version] [-citation] \
               [-haplotype | -correct | -trim | -assemble | -trim-assemble] \
@@ -132,17 +263,17 @@ The help displays that we need to feed CANU with: the reads (fastq files), an ou
 - Enter to the $SCRATCH/GenomeAssemblyBio326 folder (previously created), and make a directory named CANU.Assembly.dir
 
 ```console
-[bio326-21-0@login ~]$ cd $SCRATCH/GenomeAssemblyBio326 
-[bio326-21-0@login GenomeAssemblyBio326]$ mkdir CANU.Assembly.dir
-[bio326-21-0@login GenomeAssemblyBio326]$ ls
+[bio326-21-0@cn-4 ~]$ cd $SCRATCH/GenomeAssemblyBio326 
+[bio326-21-0@cn-4 GenomeAssemblyBio326]$ mkdir CANU.Assembly.dir
+[bio326-21-0@cn-4 GenomeAssemblyBio326]$ ls
 CANU.Assembly.dir  SalmonBacteria.rawReads.subset  SalmonBacteria.rawReads.subset.tar.gz
 ```
 - Enter to the CANU.Assembly.dir folder and copy the concatenated **SalmonBacteria.total.fastq** previously obtained (storaged in $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset)
 
 ```console
-[bio326-21-0@login GenomeAssemblyBio326]$ cd CANU.Assembly.dir/
-[bio326-21-0@login CANU.Assembly.dir]$ cp $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/SalmonBacteria.total.fastq .
-[bio326-21-0@login CANU.Assembly.dir]$ ls
+[bio326-21-0@cn-4 GenomeAssemblyBio326]$ cd CANU.Assembly.dir/
+[bio326-21-0@cn-4 CANU.Assembly.dir]$ cp $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/SalmonBacteria.total.fastq .
+[bio326-21-0@cn-4 CANU.Assembly.dir]$ ls
 SalmonBacteria.total.fastq
 ```
 
@@ -245,14 +376,14 @@ date
 **You can either copy and paste this script into your terminal, or copy the canu.SLURM.sh file from /mnt/SCRATCH/bio326-21/GenomeAssembly to your CANU.Assembly.dir folder**
 
 ```console
-[bio326-21-0@login CANU.Assembly.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/canu.SLURM.sh .
-[bio326-21-0@login CANU.Assembly.dir]$ ls
+[bio326-21-0@cn-4 CANU.Assembly.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/canu.SLURM.sh .
+[bio326-21-0@cn-4 CANU.Assembly.dir]$ ls
 canu.SLURM.sh  SalmonBacteria.total.fastq
 ```
 - Submit the job into the Orion queue 
 
 ```console
-[bio326-21-0@login CANU.Assembly.dir]$ sbatch canu.SLURM.sh
+[bio326-21-0@cn-4 CANU.Assembly.dir]$ sbatch canu.SLURM.sh
 Submitted batch job 12720147
 ```
 
@@ -265,22 +396,26 @@ Submitted batch job 12720147
 [bio326-21-0@login CANU.Assembly.dir]$ squeue -u $USER
              JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON) 
           12720147     orion     CANU bio326-2  R       0:07      1 cn-16 
-[bio326-21-0@login CANU.Assembly.dir]$ ls
+[bio326-21-0@cn-4 CANU.Assembly.dir]$ ls
 canu.SLURM.sh  SalmonBacteria.total.fastq  slurm-12720147.out
 ```
 
-*The job is running it will take ~40 min to complete. If your have troubles to run the job, there is a copy of * 
-
+*The job is running it will take ~40 min to complete.* 
 
  - Once CANU has finished it will produce the **SalmonBacteria.canu.dir** directory. Let's enter to this and take a look into the assembly:
 
+*If your job is having a long delay in the queue or shown any error, you can copy this SalmonBacteria.canu.dir result directory from /mnt/SCRATCH/bio326-21/GenomeAssembly/CANU.Assembly.dir using this command:* 
+
+```bash
+cp -r /mnt/SCRATCH/bio326-21/GenomeAssembly/CANU.Assembly.dir/SalmonBacteria.canu.dir $SCRATCH/GenomeAssemblyBio326/CANU.Assembly.dir
+```
+
 ```console
-[bio326-21-0@login CANU.Assembly.dir]$ cd SalmonBacteria.canu.dir/
-[bio326-21-0@login SalmonBacteria.canu.dir]$ ls
+[bio326-21-0@cn-4 CANU.Assembly.dir]$ cd SalmonBacteria.canu.dir/
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ ls
 canu-logs                           SalmonBacteria.canu.contigs.layout.readToTig  SalmonBacteria.canu.seqStore.err           SalmonBacteria.canu.unitigs.fasta             trimming
 canu-scripts                        SalmonBacteria.canu.contigs.layout.tigInfo    SalmonBacteria.canu.seqStore.ssi           SalmonBacteria.canu.unitigs.gfa               unitigging
 correction                          SalmonBacteria.canu.correctedReads.fasta.gz   SalmonBacteria.canu.trimmedReads.fasta.gz  SalmonBacteria.canu.unitigs.layout
 SalmonBacteria.canu.contigs.fasta   SalmonBacteria.canu.report                    SalmonBacteria.canu.unassembled.fasta      SalmonBacteria.canu.unitigs.layout.readToTig
-SalmonBacteria.canu.contigs.layout  SalmonBacteria.canu.seqStore                  SalmonBacteria.canu.unitigs.bed            SalmonBacteria.canu.unitigs.layout.tigInfo****
+SalmonBacteria.canu.contigs.layout  SalmonBacteria.canu.seqStore                  SalmonBacteria.canu.unitigs.bed            SalmonBacteria.canu.unitigs.layout.tigInfo
 ````
-
