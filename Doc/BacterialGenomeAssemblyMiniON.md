@@ -337,7 +337,7 @@ cd $USER
 mkdir tmpDir_of.$SLURM_JOB_ID
 cd tmpDir_of.$SLURM_JOB_ID
 
-cp $SLURM_SUBMIT_DIR/$inputdir/*.fastq .
+cp $SLURM_SUBMIT_DIR/*.fastq .
 
 fastqfile=$(ls -l|grep fastq|awk '{print $9}')
 
@@ -540,11 +540,202 @@ Finally, we can asses the completeness of our genome. The most common strategy i
 
 ### Evaluate genome completeness by BUSCO
 
-[BUSCO](https://busco.ezlab.org/) is a tool that attempts to provide a quantitative assessment of the completeness in terms of expected gene content of a genome assembly, transcriptome, or annotated gene set. The results are simplified into categories of Complete and single-copy, Complete and duplicated, Fragmented, or Missing BUSCOs.
+[BUSCO](https://busco.ezlab.org/) (Benchmarking Universal Single-Copy Orthologs) is a tool that attempts to provide a quantitative assessment of the completeness in terms of expected gene content of a genome assembly, transcriptome, or annotated gene set. The results are simplified into categories of Complete and single-copy, Complete and duplicated, Fragmented, or Missing BUSCOs.
 
-This sofware looks for a certain number of orthologous genes (BUSCOS) and counts the total of these ortholog genes present in your genome. Then, it estimates the completeness based on the present, duplication, fragmentarion or absence of these BUSCOS. For example (raw example), if the BUSCO database has 10 genes and the software only finds 9 of them in your genome it scores a completeness of 90 %.
+This sofware looks for a certain number of orthologous genes (BUSCOs) and counts the total of these ortholog genes present in your genome. Then, it estimates the completeness based on the present, duplication, fragmentarion or absence of these BUSCOS. For example (raw example), if the BUSCO database has 10 genes and the software only finds 9 of them in your genome it scores a completeness of 90 %.
 
 BUSCO has developed a database with common orthologs clusters for different organisims:
 ![buscoimg](https://github.com/avera1988/Genome_Assembly_lecture/blob/master/images/busco.png)
 
+Busco will predict genes in the assembly (prodigal) and then look for those BUSCOs of a certain taxonomical lineage using hmmer. It automatically download the BUSCOs database, however you can indicate and narrow the hmmer sarch to a prokaryote or eukaryote database by the **--auto-lineage-prok** flag. 
 
+- BUSCO is installed in Orion by a singularity container. Let's take a look into the options:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/u/busco\:5.0.0--py_1 busco --help
+sage: busco -i [SEQUENCE_FILE] -l [LINEAGE] -o [OUTPUT_NAME] -m [MODE] [OTHER OPTIONS]
+
+Welcome to BUSCO 5.0.0: the Benchmarking Universal Single-Copy Ortholog assessment tool.
+For more detailed usage information, please review the README file provided with this distribution and the BUSCO user guide.
+
+optional arguments:
+  -i FASTA FILE, --in FASTA FILE
+                        Input sequence file in FASTA format. Can be an assembled genome or transcriptome (DNA), or protein sequences from an annotated gene set.
+  -o OUTPUT, --out OUTPUT
+                        Give your analysis run a recognisable short name. Output folders and files will be labelled with this name. WARNING: do not provide a path
+  -m MODE, --mode MODE  Specify which BUSCO analysis mode to run.
+                        There are three valid modes:
+                        - geno or genome, for genome assemblies (DNA)
+                        - tran or transcriptome, for transcriptome assemblies (DNA)
+                        - prot or proteins, for annotated gene sets (protein)
+  -l LINEAGE, --lineage_dataset LINEAGE
+                        Specify the name of the BUSCO lineage to be used.
+  --auto-lineage        Run auto-lineage to find optimum lineage path
+  --auto-lineage-prok   Run auto-lineage just on non-eukaryote trees to find optimum lineage path
+  --auto-lineage-euk    Run auto-placement just on eukaryote tree to find optimum lineage path
+  -c N, --cpu N         Specify the number (N=integer) of threads/cores to use.
+  -f, --force           Force rewriting of existing files. Must be used when output files with the provided name already exist.
+  -r, --restart         Continue a run that had already partially completed.
+  -q, --quiet           Disable the info logs, displays only errors
+  --out_path OUTPUT_PATH
+                        Optional location for results folder, excluding results folder name. Default is current working directory.
+  --download_path DOWNLOAD_PATH
+                        Specify local filepath for storing BUSCO dataset downloads
+  --datasets_version DATASETS_VERSION
+                        Specify the version of BUSCO datasets, e.g. odb10
+  --download_base_url DOWNLOAD_BASE_URL
+                        Set the url to the remote BUSCO dataset location
+  --update-data         Download and replace with last versions all lineages datasets and files necessary to their automated selection
+  --offline             To indicate that BUSCO cannot attempt to download files
+  --metaeuk_parameters METAEUK_PARAMETERS
+                        Pass additional arguments to Metaeuk for the first run. All arguments should be contained within a single pair of quotation marks, separated by commas. E.g. "--param1=1,--param2=2"
+  --metaeuk_rerun_parameters METAEUK_RERUN_PARAMETERS
+                        Pass additional arguments to Metaeuk for the second run. All arguments should be contained within a single pair of quotation marks, separated by commas. E.g. "--param1=1,--param2=2"
+  -e N, --evalue N      E-value cutoff for BLAST searches. Allowed formats, 0.001 or 1e-03 (Default: 1e-03)
+  --limit REGION_LIMIT  How many candidate regions (contig or transcript) to consider per BUSCO (default: 3)
+  --augustus            Use augustus gene predictor for eukaryote runs
+  --augustus_parameters AUGUSTUS_PARAMETERS
+                        Pass additional arguments to Augustus. All arguments should be contained within a single pair of quotation marks, separated by commas. E.g. "--param1=1,--param2=2"
+  --augustus_species AUGUSTUS_SPECIES
+                        Specify a species for Augustus training.
+  --long                Optimization Augustus self-training mode (Default: Off); adds considerably to the run time, but can improve results for some non-model organisms
+  --config CONFIG_FILE  Provide a config file
+  -v, --version         Show this version and exit
+  -h, --help            Show this help message and exit
+  --list-datasets       Print the list of available BUSCO datasets
+  ```
+ 
+We need to indicate the genome.fasta file, the lineage (in this case --auto-lineage-prok), the mode (genome) and the output prefix. **As BUSCO works more eficiently with multiple CPUs, the best option for running this is by submitting a job in to the queue.**
+
+- The following busco.SLURM.sh script can be used for submiting BUSCO to Orion queue.
+
+```bash
+#!/bin/bash
+
+## Job name:
+#SBATCH --job-name=BUSCOBacteria
+#
+## Wall time limit:
+#SBATCH --time=00:30:00
+#
+## Other parameters:
+#SBATCH --cpus-per-task 10
+#SBATCH --mem=10G
+#SBATCH --nodes 1
+#SBATCH --partition=smallmem
+
+## Set up job environment:
+
+module --quiet purge  # Reset the modules to the system default
+
+####Do some work:########
+
+## For debuggin it is useful to print some info about the node,CPUs requested and when the job starts...
+echo "Hello" $USER
+echo "my submit directory is:"
+echo $SLURM_SUBMIT_DIR
+echo "this is the job:"
+echo $SLURM_JOB_ID
+echo "I am running on:"
+echo $SLURM_NODELIST
+echo "I am running with:"
+echo $SLURM_CPUS_ON_NODE "cpus"
+echo "Today is:"
+date
+
+## Copying data to local node for faster computation
+
+cd $TMPDIR
+
+#Check if $USER exists in $TMPDIR
+
+if [[ -d $USER ]]
+	then
+        	echo "$USER exists on $TMPDIR"
+	else
+        	mkdir $USER
+fi
+
+echo "copying files to $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID"
+
+cd $USER
+mkdir tmpDir_of.$SLURM_JOB_ID
+cd tmpDir_of.$SLURM_JOB_ID
+
+cp $SLURM_SUBMIT_DIR/*.canu.contigs.fasta .
+
+fasta=$(ls -1|grep canu.contigs.fasta)
+
+####RUNNING BUSCO####
+
+echo "Busco starts at"
+date +%d\ %b\ %T
+
+singularity exec /cvmfs/singularity.galaxyproject.org/b/u/busco\:5.0.0--py_1 busco \
+-i $fasta \
+-o Salmon.bacteria.busco \
+-m geno \
+--auto-lineage-prok \
+-c $SLURM_CPUS_ON_NODE
+
+###########Moving results #####################
+
+echo "moving results to" $SLURM_SUBMIT_DIR/
+
+rm *.fasta #Remove fastq files
+rm -r busco_downloads #Remove temp busco database downloads
+
+time cp -r * $SLURM_SUBMIT_DIR/  #Copy all results to the submit directory
+
+####Removing tmp dir#####
+
+cd $TMPDIR/$USER/
+
+rm -r tmpDir_of.$SLURM_JOB_ID
+
+echo "I've done at"
+date
+```
+*A copy of this script can be found at /mnt/SCRATCH/bio326-21/GenomeAssembly
+
+- Let's submit this script into Orion queue:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/busco.SLURM.sh .
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ sbatch busco.SLURM.sh
+Submitted batch job 12720972
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ squeue -u $USER
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON) 
+          12720785     orion     bash bio326-2  R    1:48:19      1 cn-4 
+          12720976  smallmem BUSCOBac bio326-2 PD       0:00      1 (Priority)
+```
+
+- After finishig, the job will create a **Salmon.bacteria.busco** directory. Let's enter to it and take a look:
+
+```console
+bio326-21-0@cn-4 Salmon.bacteria.busco]$ ls
+auto_lineage  prodigal_output     run_pseudomonadales_odb10                                       short_summary.specific.pseudomonadales_odb10.Salmon.bacteria.busco.txt
+logs          run_bacteria_odb10  short_summary.generic.bacteria_odb10.Salmon.bacteria.busco.txt
+```
+It creates the prodigal output and directories with the hmmer results (run_bacteria_odb10 and run_pseudomonadales_odb10). BUSCO automatically identified that our organism is a bacterium (short_summary.generic.bacteria_odb10.Salmon.bacteria.busco.txt) and it belongs to the pseudomonadales order (short_summary.specific.pseudomonadales_odb10.Salmon.bacteria.busco.txt). Then let's look into the summary to check the assembly completeness of our genome:
+
+```console
+bio326-21-0@login Salmon.bacteria.busco]$ more short_summary.specific.pseudomonadales_odb10.Salmon.bacteria.busco.txt 
+# BUSCO version is: 5.0.0 
+# The lineage dataset is: pseudomonadales_odb10 (Creation date: 2020-03-06, number of species: 159, number of BUSCOs: 782)
+# Summarized benchmarking in BUSCO notation for file /home/work/bio326-21-0/tmpDir_of.12720976/SalmonBacteria.canu.contigs.fasta
+# BUSCO was run in mode: genome
+# Gene predictor used: prodigal
+
+	***** Results: *****
+
+	C:27.6%[S:27.6%,D:0.0%],F:17.9%,M:54.5%,n:782	   
+	216	Complete BUSCOs (C)			   
+	216	Complete and single-copy BUSCOs (S)	   
+	0	Complete and duplicated BUSCOs (D)	   
+	140	Fragmented BUSCOs (F)			   
+	426	Missing BUSCOs (M)			   
+	782	Total BUSCO groups searched	
+```
+
+**Accordingly to BUSCO, the bacterial genome recovered in this experiment is only 27 % complete. Most of the genes are missing or fragmented.**
