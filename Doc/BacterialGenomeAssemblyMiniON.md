@@ -447,7 +447,7 @@ A very nice feature of the contigs fasta file from CANU is that it gives you in 
 >tig00000014 len=60508 reads=148 class=contig suggestRepeat=no suggestCircular=yes
 ```
 
-There are a total of 8 contigs in the final assembly file. Five of them are putative circular contigs. In CANU versions prior 1.9, a Graphical Fragment Assembly (GFA) file was produced. This file displays the final resolved assembly graph of all contig paths. However, the new versions of CANU has removed this feature. In this protocol we used CANU 1.9 and it produced a **SalmonBacteria.canu.unitigs.gfa** showing the contigs split at overlap junctions. We can use this to plot and visualyze how the assembly would looks like (i.e. to get a graphical view of these "suggestedCircular" contigs). *It is important to notice that these graphs often would be missing edges and be over-fragmented.*
+There are a total of 8 contigs in the final assembly file. Five of them are putative circular contigs. In CANU versions prior 1.9, a Graphical Fragment Assembly (GFA) file was produced. This file displays the final resolved assembly graph of all contig paths. However, the new versions of CANU has removed this feature. In this protocol we used CANU 1.9 and it produced a **SalmonBacteria.canu.unitigs.gfa** showing the contigs split at overlap junctions. We can use this to plot and visualize how the assembly would looks like (i.e. to get a graphical view of these "suggestedCircular" contigs). *It is important to notice that these graphs often would be missing edges and be over-fragmented.*
 
 - To obtain a plot from a gfa file we can use the [Bandage](https://github.com/rrwick/Bandage) software. Bandage is installed as a singlularity container in Orion, we can load the software as follow:
 
