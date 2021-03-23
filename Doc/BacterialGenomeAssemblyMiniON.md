@@ -85,7 +85,7 @@ PS: We are on Teams: https://bit.ly/orion-teams
 [bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools
 (/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-4 GenomeAssemblyBio326]$
 ```
-*If you now see that your prompt has changed with the legend "(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools)" means the conda env has been properly load*
+*If you now see that your prompt has changed with the legend "(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools)" means the conda env has been properly loaded*
 
 - Now let's call the program NanoPlot and see the options.
 
@@ -198,7 +198,7 @@ drwxrwxr-x 2 bio326-21-0 bio326-21-0 4.0K Mar 23 12:53 summary-plots-log-transfo
 
 ```
 
-7. We can count the number of reads in this "big" concatenated file. For this we can count the number of lines in the file and divide them by four (the number of canonical elements in a fastq file)...
+7. We can count the number of reads in this "big" concatenated file. For this we count the number of lines in the file and divide them by four (the number of canonical elements in a fastq file)...
 
 ```
 A FASTQ file normally uses four lines per sequence.
@@ -419,6 +419,7 @@ correction                          SalmonBacteria.canu.correctedReads.fasta.gz 
 SalmonBacteria.canu.contigs.fasta   SalmonBacteria.canu.report                    SalmonBacteria.canu.unassembled.fasta      SalmonBacteria.canu.unitigs.layout.readToTig
 SalmonBacteria.canu.contigs.layout  SalmonBacteria.canu.seqStore                  SalmonBacteria.canu.unitigs.bed            SalmonBacteria.canu.unitigs.layout.tigInfo
 ````
+### Analyzing the CANU results. 
 
 - To understand the results, let's take a look into the main [CANU pipeline](https://canu.readthedocs.io/en/latest/pipeline.html) ![canu pipeline](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-pipeline.svg)
 ![canu overlap](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-overlaps.svg)
@@ -445,4 +446,49 @@ A very nice feature of the contigs fasta file from CANU is that it gives you in 
 >tig00000010 len=19016 reads=80 class=contig suggestRepeat=no suggestCircular=no
 >tig00000014 len=60508 reads=148 class=contig suggestRepeat=no suggestCircular=yes
 ```
+
+There are a total of 8 contigs in the final assembly file. Five of them are putative circular contigs. In all CANU versions prior 1.9, it generates a Graphical Fragment Assembly (GFA) file displaying the final resolved assembly of contig paths. However, the new versions of CANU has removed this feature. In this protocol we used CANU 1.9 and it produce a **SalmonBacteria.canu.unitigs.gfa** showing the contigs split at overlap junctions. We can use this to plot and visualyze how the assembly would looks like (e.g. to get a graphical view of these "suggestedCircular" contigs). *It is important to notice that these graphs often would be missing edges and be over-fragmented.*
+
+- To obtain a plot from a gfa file we can use the [Bandage](https://github.com/rrwick/Bandage) software. Bandage is installed as a singlularity container, we can load the software as follow:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/a/bandage\:0.8.1--hc9558a2_2 Bandage --help
+QStandardPaths: XDG_RUNTIME_DIR points to non-existing path '/run/user/4000', please create it with 0700 permissions.
+
+  ____                  _                  
+ |  _ \                | |                 
+ | |_) | __ _ _ __   __| | __ _  __ _  ___ 
+ |  _ < / _` | '_ \ / _` |/ _` |/ _` |/ _ \
+ | |_) | (_| | | | | (_| | (_| | (_| |  __/
+ |____/ \__,_|_| |_|\__,_|\__,_|\__, |\___|
+                                 __/ |     
+                                |___/      
+Version: 0.8.1
+
+Usage:    Bandage <command> [options]
+          
+Commands: <blank>      Launch the Bandage GUI
+          load         Launch the Bandage GUI and load a graph file
+          info         Display information about a graph
+          image        Generate an image file of a graph
+          querypaths   Output graph paths for BLAST queries
+          reduce       Save a subgraph of a larger graph
+          
+Options:  --help       View this help message
+          --helpall    View all command line settings
+          --version    View Bandage version number
+          
+Online Bandage help: https://github.com/rrwick/Bandage/wiki
+```
+
+- Then we can feed this program with the **SalmonBacteria.canu.unitigs.gfa** and indicate to generate the image in png format from that graph.
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/a/bandage\:0.8.1--hc9558a2_2 Bandage image SalmonBacteria.canu.unitigs.gfa SalmonBacteria.canu.unitigs.png
+```
+
+- The result is a png image displaying the union of "contigs" in the assembly graph. To open this file you need to copy to your computer or use the GUI Jupyterhub. The following is how this file looks like ![bandage](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/SalmonBacteria.canu.unitigs.png)
+
+
+
 
