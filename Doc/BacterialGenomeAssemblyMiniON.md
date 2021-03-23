@@ -534,7 +534,7 @@ N100 = 2535, n = 8
 N_count = 0
 Gaps = 0
 ```
-**The total of bases in the assembly sum ~3.46 Mb, this is the final length of the assembly. The N50 (statistic that defines the assembly quality in terms of contiguity. It can be defined as: given a set of contigs, the N50 is the sequence length of the shortest contig at 50% of the total genome length...), is ~ 3.28 Mb in a single contig.
+**The total of bases in the assembly sum ~3.46 Mb, this is the final length of the assembly. The N50 (statistic that defines the assembly quality in terms of contiguity. It can be defined as: given a set of contigs, the N50 is the sequence length of the shortest contig at 50% of the total genome length...), is ~ 3.28 Mb in a single contig.**
 
 Finally, we can assess the completeness of our genome. The most used strategy is to look for the presence of a set of single-copy orthologs genes commonly present in all bacteria (universal genes) and score the number of occurrences in our genome. 
 
@@ -696,7 +696,7 @@ rm -r tmpDir_of.$SLURM_JOB_ID
 echo "I've done at"
 date
 ```
-*A copy of this script can be found at /mnt/SCRATCH/bio326-21/GenomeAssembly
+*A copy of this script can be found at /mnt/SCRATCH/bio326-21/GenomeAssembly*
 
 - Let's submit this script into Orion queue:
 
