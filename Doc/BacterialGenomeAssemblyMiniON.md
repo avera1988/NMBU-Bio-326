@@ -118,7 +118,7 @@ The global colormaps dictionary is no longer considered public API.
 
 The global colormaps dictionary is no longer considered public API.
 ```
-- Although the software display some "warnings" it seems finished without error and produced the summary-plots-log-transformed folder:
+- Although the software displayed some "warnings" it seems finished without error and produced the summary-plots-log-transformed folder:
 
 ```console
 (/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-4 SalmonBacteria.rawReads.subset]$ ls
