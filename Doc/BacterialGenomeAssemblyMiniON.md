@@ -217,7 +217,7 @@ Let's do it:
 
 *Command line explained: first, we count all the lines (wc -l) of the SalmonBacteria.total.fastq file and storage into a variable ($). Then, we divided that variable \[echo $(wc -l < SalmonBacteria.total.fastq)\] by four, and in order to the computer be able to print the result we call the command bc (Basic calculator).*
 
-Acording to this results, we have a total of 24,000 reads in the file concatenated file, that is the same number of reads we got in the summary stats. This is a good quality control steep.
+Acording to this results, we have a total of 24,000 reads in the SalmonBacteria.total.fastq concatenated file, that is the same number of the total ammount of reads we got in the summary stats. This is a good quality control steep.
 
 ## Assembly raw-reads into a genome (genomic contigs) using CANU assembler ###
 
@@ -420,5 +420,29 @@ SalmonBacteria.canu.contigs.fasta   SalmonBacteria.canu.report                  
 SalmonBacteria.canu.contigs.layout  SalmonBacteria.canu.seqStore                  SalmonBacteria.canu.unitigs.bed            SalmonBacteria.canu.unitigs.layout.tigInfo
 ````
 
-- To understand the results, let's take a look into the main [CANU]() pipeline ![canu pipeline](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-pipeline.svg)
+- To understand the results, let's take a look into the main [CANU pipeline](https://canu.readthedocs.io/en/latest/pipeline.html) ![canu pipeline](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-pipeline.svg)
 ![canu overlap](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/canu-overlaps.svg)
+
+- Thus the final assembled sequences (contigs) are in the **SalmonBacteria.canu.contigs.fasta** file. Let's display the first 2 lines of this fasta file:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ head -2 SalmonBacteria.canu.contigs.fasta 
+>tig00000001 len=3285151 reads=10946 class=contig suggestRepeat=no suggestCircular=no
+CTATTGACGGAACAAATGCGCGCTCAATAGCATCTATCGTCACGTATTCGGGCAGTACCAGCGTGGCATTGCCTGCGACCAGTGGTGACCAAAAAGCGAA
+```
+A very nice feature of the contigs fasta file from CANU is that it gives you in the header of the contigs importat assembly metrics, as the lenght of the contig, the number of reads used to assembly that genomic fragment, if there is any repet region, and suggest circular chromosomes. We can print all this information on each header for each contig:
+
+- As each sequence header in a fasta file starts with a ">" symbol, we can look for all lines with that symbol in the fasta file as follows:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ grep ">" SalmonBacteria.canu.contigs.fasta
+>tig00000001 len=3285151 reads=10946 class=contig suggestRepeat=no suggestCircular=no
+>tig00000004 len=9364 reads=164 class=contig suggestRepeat=no suggestCircular=yes
+>tig00000005 len=14824 reads=160 class=contig suggestRepeat=no suggestCircular=yes
+>tig00000006 len=2535 reads=56 class=contig suggestRepeat=no suggestCircular=yes
+>tig00000008 len=7126 reads=85 class=contig suggestRepeat=no suggestCircular=yes
+>tig00000009 len=59408 reads=207 class=contig suggestRepeat=no suggestCircular=no
+>tig00000010 len=19016 reads=80 class=contig suggestRepeat=no suggestCircular=no
+>tig00000014 len=60508 reads=148 class=contig suggestRepeat=no suggestCircular=yes
+```
+
