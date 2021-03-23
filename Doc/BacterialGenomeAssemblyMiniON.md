@@ -491,7 +491,7 @@ Online Bandage help: https://github.com/rrwick/Bandage/wiki
 
 ## Evaluate the length of the assembly, fragmentation, and completeness of the genome.
 
-**As we noticed, the genomic assembly of this bacterial isolate resulted in 8 contigs. But what is the lenght of the total assembly, the largest conting and other metrics to evaluate the size and fragmentation of the genome?
+**As we noticed, the genomic assembly of this bacterial isolate resulted in 8 contigs. But what is the lenght of the total assembly, the largest conting and other metrics to evaluate the size and fragmentation of the genome?**
 
 To answer this, we can obtain the total size (sum of all bases in the genome), the average lenght of the contigs and the N50-N90 statistics of the genome using the *assembly-stats* script developed by the [Sanger Institute](https://github.com/sanger-pathogens/assembly-stats).
 
