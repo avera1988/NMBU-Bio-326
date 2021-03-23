@@ -481,7 +481,7 @@ Options:  --help       View this help message
 Online Bandage help: https://github.com/rrwick/Bandage/wiki
 ```
 
-- Then we can feed this program with the **SalmonBacteria.canu.unitigs.gfa** and indicate to generate the image in png format from that graph.
+- Then we can feed this program with the **SalmonBacteria.canu.unitigs.gfa** and indicate to generate an image in png format from that graph.
 
 ```console
 [bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/a/bandage\:0.8.1--hc9558a2_2 Bandage image SalmonBacteria.canu.unitigs.gfa SalmonBacteria.canu.unitigs.png
@@ -489,6 +489,62 @@ Online Bandage help: https://github.com/rrwick/Bandage/wiki
 
 - The result is a png image displaying the union of "contigs" in the assembly graph. To open this file you need to copy to your computer or use the GUI Jupyterhub. The following is how this file looks like ![bandage](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/SalmonBacteria.canu.unitigs.png)
 
+## Evaluate the length of the assembly, fragmentation, and completeness of the genome.
 
+**As we noticed, the genomic assembly of this bacterial isolate resulted in 8 contigs. But what is the lenght of the total assembly, the largest conting and other metrics to evaluate the size and fragmentation of the genome?
+
+To answer this, we can obtain the total size (sum of all bases in the genome), the size average of the contigs and the N50-N90 statistics of the genome using the *assembly-stats* script developed by the [Sanger Institute](https://github.com/sanger-pathogens/assembly-stats).
+
+- This software is in the conda-environment ONPTools previously loaded. *If you have not load this enviroment or was loged out the cluster, jsut activate the conda first*. 
+- The command can be called by:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ assembly-stats 
+usage: stats [options] <list of fasta/q files>
+
+Reports sequence length statistics from fasta and/or fastq files
+
+options:
+-l <int>
+	Minimum length cutoff for each sequence.
+	Sequences shorter than the cutoff will be ignored [1]
+-s
+	Print 'grep friendly' output
+-t
+	Print tab-delimited output
+-u
+	Print tab-delimited output with no header line
+-v
+	Print version and exit
+
+```
+- We can then give the **SalmonBacteria.canu.contigs.fasta** to this software and look the results:
+
+```console
+[bio326-21-0@cn-4 SalmonBacteria.canu.dir]$ assembly-stats  SalmonBacteria.canu.contigs.fasta 
+stats for SalmonBacteria.canu.contigs.fasta
+sum = 3457932, n = 8, ave = 432241.50, largest = 3285151
+N50 = 3285151, n = 1
+N60 = 3285151, n = 1
+N70 = 3285151, n = 1
+N80 = 3285151, n = 1
+N90 = 3285151, n = 1
+N100 = 2535, n = 8
+N_count = 0
+Gaps = 0
+```
+**The total bases in the assembly sum ~3.46 Mb (sum) in a total of 8 contigs. The N50 (statistic defines assembly quality in terms of contiguity. Given a set of contigs, the N50 is defined as the sequence length of the shortest contig at 50% of the total genome length...), is ~ 3.28 Mb lenght in a single contig.
+
+Finally, we can asses the completeness of our genome. The most common strategy is to look for the present of a set of single-copy orthologs genes commonly present in all bacteria and score the number of ocurrences in our genome. 
+
+### Evaluate genome completeness by BUSCO
+
+[BUSCO](https://busco.ezlab.org/) is a tool that attempts to provide a quantitative assessment of the completeness in terms of expected gene content of a genome assembly, transcriptome, or annotated gene set. The results are simplified into categories of Complete and single-copy, Complete and duplicated, Fragmented, or Missing BUSCOs.
+
+This sofware looks for a certain number of orthologous genes (BUSCOS) and counts the total of these ortholog genes present in your genome. Then, it estimates the completeness based on the present, duplication, fragmentarion or absence of these BUSCOS. For example (raw example), if the BUSCO database has 10 genes and the software only finds 9 of them in your genome it scores a completeness of 90 %.
+
+BUSCO has developed a database with common orthologs clusters for different organisims:
+![buscoimg](https://github.com/avera1988/Genome_Assembly_lecture/blob/master/images/busco.png)
 
 
