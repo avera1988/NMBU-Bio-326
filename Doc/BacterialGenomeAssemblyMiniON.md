@@ -139,7 +139,7 @@ CumulativeYieldPlot_NumberOfReads.png  LengthvsQualityScatterPlot_loglength_kde.
 Dynamic_Histogram_Read_length.html     LogTransformed_HistogramReadlength.png        TimeLogLengthViolinPlot.png
 HistogramReadlength.png                NanoPlot_20210323_1252.log                    TimeQualityViolinPlot.png
 ```
-- The pipeline produced multiple plots (png files), an html report (NanoPlot-report.html) and a text file (NanoStats.txt) with the Nanopore reads statistics. To visualize the png and html you need to copy your files to your compuer or use the GUI [Orion Jupyter hub](https://orion.nmbu.no/jupyter) to access this. However, we can take a quick view of the stats report in the text file **NanoStats.txt** uaing the command line.
+- The pipeline produced multiple plots (png files), an html report (NanoPlot-report.html) and a text file (NanoStats.txt) with the Nanopore reads statistics. To visualize the png and html you need to copy your files to your compuer or use the GUI [Orion Jupyter hub](https://orion.nmbu.no/jupyter) to access this. However, we can take a quick view of the stats report in the text file **NanoStats.txt** using the command line.
 
 ```console
 [bio326-21-0@cn-4 summary-plots-log-transformed]$ more NanoStats.txt 
@@ -173,7 +173,17 @@ Top 5 longest reads and their mean basecall quality score
 5:	63998 (8.2)
 ```
  **This result let us know that a total of 24,000 reads are present in this subset of the MiniON sequencing experiment, with an average read lenght of 4,266 nucleotides (nt) and the largest read has a lenght of 117,332 nt. We then can continue with the assembly...**
- 
+
+*If you would like to copy these results files from Orion to your computer there are at least two ways for doing: Uing a graphic interface (i.e MobaXterm) or the command line. For MobaXterm, first open a "session to Orion" and go to cd $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed  Then click on followTerminalFolder at the botom of the screen (check the image below).![moba](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/moba.png).*
+
+*If you don't have access to MobaXterm, we can use the command line and the "secure copy" command (scp). Open a teminal in your computer type the following command:*
+
+```console
+avera@L003772:Bio326today$ scp -r bio326-21-0@login.orion.nmbu.no:/mnt/SCRATCH/bio326-21-0/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed .
+```
+*Command explain: scp (secureCopy) -r (recursive all foldersandfiles) username@remotecomputer.adress:directory/we/like/to/copy . (local computer directory)*
+
+
 6. As you notice there are six fastq files in the SalmonBacteria.rawReads.subset directory. **It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
 
 ```console
@@ -197,6 +207,7 @@ drwxrwxr-x 2 bio326-21-0 bio326-21-0 4.0K Mar 23 12:53 summary-plots-log-transfo
 -rw-rw-r-- 1 bio326-21-0 bio326-21-0 199M Mar 23 13:18 SalmonBacteria.total.fastq
 
 ```
+
 
 7. As a control steep and to know if we have the same ammount of sequences (24,000) we got in the summary file in the new concatenated file, we need to count the number of reads in this "big" file. For this we can count the number of lines in the file and divide them by four (the number of canonical elements in a fastq file)...
 
@@ -237,7 +248,7 @@ Let's check the options on CANU assembler to know what elements do we need:
 - Then display the CANU's help
 
 ```console
-[bio326-21-0@cn-4 GenomeAssemblyBio326]$ module load canu/1.9-GCCcore-8.3.0-Java-11 canu --help
+[bio326-21-0@cn-4 GenomeAssemblyBio326]$ canu --help
 
 usage:   canu [-version] [-citation] \
               [-haplotype | -correct | -trim | -assemble | -trim-assemble] \
