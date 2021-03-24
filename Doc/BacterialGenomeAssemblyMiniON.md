@@ -174,14 +174,14 @@ Top 5 longest reads and their mean basecall quality score
 ```
  **This result let us know that a total of 24,000 reads are present in this subset of the MiniON sequencing experiment, with an average read lenght of 4,266 nucleotides (nt) and the largest read has a lenght of 117,332 nt. We then can continue with the assembly...**
 
-*If you would like to copy these results files from Orion to your computer there are at least two ways for doing this: a) Using a graphic interface (i.e MobaXterm) or the command line. For MobaXterm, first open a "session to Orion" and go to cd $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed  Then click on followTerminalFolder at the botom of the screen (check the image below).![moba](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/moba.png). Then you can simply select, grab and drag all the files from the left panel to a folder on your computer*
+*If you would like to copy these results files from Orion to your computer there are at least two ways for doing this: a) Using a graphic interface (i.e MobaXterm) or the command line. For MobaXterm, first open a "session to Orion" and go to cd $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed  Then click on followTerminalFolder at the botom of the screen (check the image below).![moba](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/moba.png). Then you can simply select, grab and drag all the files from the left panel of mobaXterm screen to a folder on your computer*
 
 * b) If you don't have access to MobaXterm, we can use the command line and the "secure copy" command (scp). Open a teminal in your computer type the following command:*
 
 ```console
 avera@L003772:Bio326today$ scp -r bio326-21-0@login.orion.nmbu.no:/mnt/SCRATCH/bio326-21-0/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed .
 ```
-*Command explain: scp (secureCopy) -r (recursive all foldersandfiles) username@remotecomputer.adress:directory/we/like/to/copy . (local computer directory)*
+*Command explain: scp (SecureCoPy) -r (recursive all foldersandfiles) username@remotecomputer.adress:directory/we/like/to/copy . (local computer directory)*
 
 
 6. As you notice there are six fastq files in the SalmonBacteria.rawReads.subset directory. **It is often useful to concatenate all the different fastq files into one big file for downstream analyses.**
