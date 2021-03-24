@@ -174,9 +174,9 @@ Top 5 longest reads and their mean basecall quality score
 ```
  **This result let us know that a total of 24,000 reads are present in this subset of the MiniON sequencing experiment, with an average read lenght of 4,266 nucleotides (nt) and the largest read has a lenght of 117,332 nt. We then can continue with the assembly...**
 
-*If you would like to copy these results files from Orion to your computer there are at least two ways for doing: Uing a graphic interface (i.e MobaXterm) or the command line. For MobaXterm, first open a "session to Orion" and go to cd $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed  Then click on followTerminalFolder at the botom of the screen (check the image below).![moba](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/moba.png).*
+*If you would like to copy these results files from Orion to your computer there are at least two ways for doing this: a) Using a graphic interface (i.e MobaXterm) or the command line. For MobaXterm, first open a "session to Orion" and go to cd $SCRATCH/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed  Then click on followTerminalFolder at the botom of the screen (check the image below).![moba](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/moba.png). Then you can simply select, grab and drag all the files from the left panel to a folder on your computer*
 
-*If you don't have access to MobaXterm, we can use the command line and the "secure copy" command (scp). Open a teminal in your computer type the following command:*
+* b) If you don't have access to MobaXterm, we can use the command line and the "secure copy" command (scp). Open a teminal in your computer type the following command:*
 
 ```console
 avera@L003772:Bio326today$ scp -r bio326-21-0@login.orion.nmbu.no:/mnt/SCRATCH/bio326-21-0/GenomeAssemblyBio326/SalmonBacteria.rawReads.subset/summary-plots-log-transformed .
