@@ -978,7 +978,7 @@ Let's compare the BUSCOs from this consensus and the original:
 
 It looks like this "polishing" improves a bit the BUSCO from 27.6 % to 28.6 % and help to recover more genes. What happen if we use racon + Medaka another useful tool for polishing.
 
-###[Medaka](https://nanoporetech.github.io/medaka/)
+### [Medaka](https://nanoporetech.github.io/medaka/)
 
 Medaka is a tool to create a consensus sequence of nanopore sequencing data. This task is performed using neural networks applied a pileup of individual sequencing reads against a draft assembly. It outperforms graph-based methods operating on basecalled data, and can be competitive with state-of-the-art signal-based methods whilst being much faster.
 
