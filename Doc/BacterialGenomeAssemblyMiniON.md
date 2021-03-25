@@ -1083,7 +1083,7 @@ tabix      1.11       1.9        True
 .....
 Polished assembly written to SalmonBacteria.medaka.out/consensus.fasta, have a nice day.
 ```
-*As medaka runs multiple process not all are displayed in this protol...*
+*As medaka runs multiple process not all of them are displayed in this protocol...*
 
 4. Now let's check the resulting folder and consensus fasta files in **SalmonBacteria.medaka.out/consensus.fasta**. By this we can compare the assembly statistics on the 3 experiments (i.e., raw canu, racon, and medaka):
 
@@ -1188,7 +1188,7 @@ Now just rename the working.dir to a something more useful:
 [bio326-21-0@login SalmonBacteria.canu.dir]$ mv working.dir.12724085/ Polishing.dir
 ```
 
-**All this process can be submited via job using the /mnt/SCRATCH/bio326-21/GenomeAssembly/polishingNanopore.SLURM.sh
+**All this polishing process can be submited via job using the /mnt/SCRATCH/bio326-21/GenomeAssembly/polishingNanopore.SLURM.sh**
 
 ```console
 [bio326-21-0@login SalmonBacteria.canu.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/polishingNanopore.SLURM.sh .
