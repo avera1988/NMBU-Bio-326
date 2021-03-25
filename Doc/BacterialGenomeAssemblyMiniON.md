@@ -1193,7 +1193,7 @@ Now just rename the working.dir to a something more useful:
 ```console
 [bio326-21-0@login SalmonBacteria.canu.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/polishingNanopore.SLURM.sh .
 [bio326-21-0@login SalmonBacteria.canu.dir]$ sbatch polishingNanopore.SLURM.sh 
-Submitted batch job 12724137	 
+Submitted batch job 12724140	 
 ```
 
 ## Welcome to the bacterial genomic realm....Enjoy the Nanopore sequencing ....
