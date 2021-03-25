@@ -1163,7 +1163,7 @@ INFO:
 
 Now the assembly improves up to 33.8 % completeness with more BUSCOs found. 
 
-**We can then use this final Medaka consensus assembly as our final bacterial draft genome to do produce some annotations and look for interesting metabolic features.**
+**We can then use this final Medaka consensus assembly as our final bacterial draft genome for downstream analysis... (i.e., genomic annotaion)**
 
 
 6. Finally, remeber to copy all the results back to the $SCRATCH. 
