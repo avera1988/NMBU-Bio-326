@@ -1196,6 +1196,6 @@ Now just rename the working.dir to a something more useful:
 Submitted batch job 12724137	 
 ```
 
-##Welcome to the bacterial genomic realm....Enjoy the Nanopore sequencing ....
+## Welcome to the bacterial genomic realm....Enjoy the Nanopore sequencing ....
 
 
