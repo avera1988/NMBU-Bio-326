@@ -1188,5 +1188,14 @@ Now just rename the working.dir to a something more useful:
 [bio326-21-0@login SalmonBacteria.canu.dir]$ mv working.dir.12724085/ Polishing.dir
 ```
 
+**All this process can be submited via job using the /mnt/SCRATCH/bio326-21/GenomeAssembly/polishingNanopore.SLURM.sh
+
+```console
+[bio326-21-0@login SalmonBacteria.canu.dir]$ cp /mnt/SCRATCH/bio326-21/GenomeAssembly/polishingNanopore.SLURM.sh .
+[bio326-21-0@login SalmonBacteria.canu.dir]$ sbatch polishingNanopore.SLURM.sh 
+Submitted batch job 12724137	 
+```
+
+##Welcome to the bacterial genomic realm....Enjoy the Nanopore sequencing ....
 
 
