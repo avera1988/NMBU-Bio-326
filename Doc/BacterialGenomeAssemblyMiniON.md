@@ -1071,7 +1071,7 @@ medaka_consensus [-h] -i <fastx>
 3. Medaka needs: The basecalled fastq file (-i), the assembled contigs (-d) and a model (-m) telling how the reads were generated and basecalled for training. In this experiment we used the MiniOn platform and the basecalling were performed by guppy using the fast mode, so the model we will use is the **r941_min_fast_g303**. Also is useful to name an output (-o) directory.
 
 ```console
-(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ medaka_consensus -t $SLURM_CPUS_ON_NODE -i SalmonBacteria.canu.correctedReads.fasta.gz -d SalmonBacteria.racon2.consensus.fasta -o SalmonBacteria.medaka.out 
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ medaka_consensus -t $SLURM_CPUS_ON_NODE -i SalmonBacteria.canu.correctedReads.fasta.gz -d SalmonBacteria.racon2.consensus.fasta -g r941_min_fast_g303 -o SalmonBacteria.medaka.out 
 Checking program versions
 This is medaka 1.2.3
 Program    Version    Required   Pass     
