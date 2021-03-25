@@ -976,5 +976,217 @@ Let's compare the BUSCOs from this consensus and the original:
 	782	Total BUSCO groups searched
 ```
 
+It looks like this "polishing" improves a bit the BUSCO from 27.6 % to 28.6 % and help to recover more genes. What happen if we use racon + Medaka another useful tool for polishing.
+
+###[Medaka](https://nanoporetech.github.io/medaka/)
+
+Medaka is a tool to create a consensus sequence of nanopore sequencing data. This task is performed using neural networks applied a pileup of individual sequencing reads against a draft assembly. It outperforms graph-based methods operating on basecalled data, and can be competitive with state-of-the-art signal-based methods whilst being much faster.
+
+There is evidence that Medaka improves if racon is run on the assemble more than once. In this protocol we will run racon a second time on the assembly and then medaka.
+
+1. Run a second round of racon using the same aproach as above but changing the original fasta file for the racon consensus file for mapping the reads and do the correction on it:
+
+```console
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ minimap2 -t $SLURM_CPUS_ON_NODE SalmonBacteria.canu.racon.consensus.fasta SalmonBacteria.canu.correctedReads.fasta.gz > SalmonBacteria.racon.paf
+[M::mm_idx_gen::0.159*1.02] collected minimizers
+[M::mm_idx_gen::0.205*1.09] sorted minimizers
+[M::main::0.205*1.09] loaded/built the index for 8 target sequence(s)
+[M::mm_mapopt_update::0.218*1.09] mid_occ = 17
+[M::mm_idx_stat] kmer size: 15; skip: 10; is_hpc: 0; #seq: 8
+[M::mm_idx_stat::0.228*1.08] distinct minimizers: 617329 (96.77% are singletons); average occurrences: 1.047; average spacing: 5.353
+[M::worker_pipeline::3.700*5.79] mapped 16454 sequences
+[M::main] Version: 2.17-r941
+[M::main] CMD: minimap2 -t 10 SalmonBacteria.canu.racon.consensus.fasta SalmonBacteria.canu.correctedReads.fasta.gz
+[M::main] Real time: 3.713 sec; CPU: 21.451 sec; Peak RSS: 0.134 GB
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ racon -t $SLURM_CPUS_ON_NODE SalmonBacteria.canu.correctedReads.fasta.gz SalmonBacteria.racon.paf SalmonBacteria.canu.racon.consensus.fasta > SalmonBacteria.racon2.consensus.fasta
+[racon::Polisher::initialize] loaded target sequences 0.037714 s
+[racon::Polisher::initialize] loaded sequences 1.231584 s
+[racon::Polisher::initialize] loaded overlaps 0.029424 s
+[racon::Polisher::initialize] aligning overlaps [====================] 5.368575 s
+[racon::Polisher::initialize] transformed data into windows 0.041861 s
+[racon::Polisher::polish] generating consensus [====================] 10.453044 s
+[racon::Polisher::] total = 17.200604 s
+```
+2. Let's check the requirements of Medaka:
+
+
+```console
+/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ medaka --help
+usage: medaka [-h] [--version]
+              {compress_bam,features,train,consensus,smolecule,consensus_from_features,fastrle,stitch,variant,snp,tools}
+              ...
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+
+subcommands:
+  valid commands
+
+  {compress_bam,features,train,consensus,smolecule,consensus_from_features,fastrle,stitch,variant,snp,tools}
+                        additional help
+    compress_bam        Compress an alignment into RLE form.
+    features            Create features for inference.
+    train               Train a model from features.
+    consensus           Run inference from a trained model and alignments.
+    smolecule           Create consensus sequences from single-molecule reads.
+    consensus_from_features
+                        Run inference from a trained model on existing
+                        features.
+    fastrle             Create run-length encoded fastq (lengths in quality
+                        track).
+    stitch              Stitch together output from medaka consensus into
+                        final output.
+    variant             Decode probabilities to VCF.
+    snp                 Decode probabilities to SNPs.
+    tools               tools subcommand.
+```
+
+We can see that medaka has multiple pipelines for running. In this protocol we will use the **medaka_consensus** option to generate the fasta consensus assembled contigs:
+
+```console
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ medaka_consensus -help
+
+medaka 1.2.3
+------------
+
+Assembly polishing via neural networks. The input assembly should be
+preprocessed with racon.
+
+medaka_consensus [-h] -i <fastx>
+
+    -h  show this help text.
+    -i  fastx input basecalls (required).
+    -d  fasta input assembly (required).
+    -o  output folder (default: medaka).
+    -g  don't fill gaps in consensus with draft sequence.
+    -m  medaka model, (default: r941_min_high_g360).
+        Available: r103_min_high_g345, r103_min_high_g360, r103_prom_high_g360, r103_prom_snp_g3210, r103_prom_variant_g3210, r10_min_high_g303, r10_min_high_g340, r941_min_fast_g303, r941_min_high_g303, r941_min_high_g330, r941_min_high_g340_rle, r941_min_high_g344, r941_min_high_g351, r941_min_high_g360, r941_prom_fast_g303, r941_prom_high_g303, r941_prom_high_g330, r941_prom_high_g344, r941_prom_high_g360, r941_prom_high_g4011, r941_prom_snp_g303, r941_prom_snp_g322, r941_prom_snp_g360, r941_prom_variant_g303, r941_prom_variant_g322, r941_prom_variant_g360.
+        Alternatively a .hdf file from 'medaka train'.
+    -f  Force overwrite of outputs (default will reuse existing outputs).
+    -t  number of threads with which to create features (default: 1).
+    -b  batchsize, controls memory use (default: 100).
+```
+
+3. Medaka needs: The basecalled fastq file (-i), the assembled contigs (-d) and a model (-m) telling how the reads were generated and basecalled for training. In this experiment we used the MiniOn platform and the basecalling were performed by guppy using the fast mode, so the model we will use is the **r941_min_fast_g303**. Also is useful to name an output (-o) directory.
+
+```console
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ medaka_consensus -t $SLURM_CPUS_ON_NODE -i SalmonBacteria.canu.correctedReads.fasta.gz -d SalmonBacteria.racon2.consensus.fasta -o SalmonBacteria.medaka.out 
+Checking program versions
+This is medaka 1.2.3
+Program    Version    Required   Pass     
+bcftools   1.11       1.9        True     
+bgzip      1.11       1.9        True     
+minimap2   2.17       2.11       True     
+samtools   1.11       1.9        True     
+tabix      1.11       1.9        True     
+.....
+Polished assembly written to SalmonBacteria.medaka.out/consensus.fasta, have a nice day.
+```
+*As medaka runs multiple process not all are displayed in this protol...*
+
+4. Now let's check the resulting folder and consensus fasta files in **SalmonBacteria.medaka.out/consensus.fasta**. By this we can compare the assembly statistics on the 3 experiments (i.e., raw canu, racon, and medaka):
+
+```console
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ cd SalmonBacteria.medaka.out/
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 SalmonBacteria.medaka.out]$ assembly-stats ../SalmonBacteria.canu.contigs.fasta ../SalmonBacteria.canu.racon.consensus.fasta consensus.fasta
+stats for ../SalmonBacteria.canu.contigs.fasta
+sum = 3457932, n = 8, ave = 432241.50, largest = 3285151
+N50 = 3285151, n = 1
+N60 = 3285151, n = 1
+N70 = 3285151, n = 1
+N80 = 3285151, n = 1
+N90 = 3285151, n = 1
+N100 = 2535, n = 8
+N_count = 0
+Gaps = 0
+-------------------------------------------------------------------------------
+stats for ../SalmonBacteria.canu.racon.consensus.fasta
+sum = 3459138, n = 8, ave = 432392.25, largest = 3287128
+N50 = 3287128, n = 1
+N60 = 3287128, n = 1
+N70 = 3287128, n = 1
+N80 = 3287128, n = 1
+N90 = 3287128, n = 1
+N100 = 2235, n = 8
+N_count = 0
+Gaps = 0
+-------------------------------------------------------------------------------
+stats for consensus.fasta
+sum = 3460364, n = 8, ave = 432545.50, largest = 3288664
+N50 = 3288664, n = 1
+N60 = 3288664, n = 1
+N70 = 3288664, n = 1
+N80 = 3288664, n = 1
+N90 = 3288664, n = 1
+N100 = 2192, n = 8
+N_count = 0
+Gaps = 0
+```
+
+Again this polishing increased the number of bases. 
+
+5. Now lets run BUSCO on this:
+
+```console
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 SalmonBacteria.medaka.out]$ singularity exec /cvmfs/singularity.galaxyproject.org/b/u/busco\:5.0.0--py_1 busco -i consensus.fasta -o Busco_medaka -m geno --auto-lineage-prok -c $SLURM_CPUS_ON_NODE
+INFO:	***** Start a BUSCO v5.0.0 analysis, current time: 03/25/2021 20:57:49 *****
+
+...
+
+INFO:	
+
+	--------------------------------------------------
+	|Results from generic domain bacteria_odb10       |
+	--------------------------------------------------
+	|C:33.9%[S:33.9%,D:0.0%],F:50.8%,M:15.3%,n:124    |
+	|42	Complete BUSCOs (C)                       |
+	|42	Complete and single-copy BUSCOs (S)       |
+	|0	Complete and duplicated BUSCOs (D)        |
+	|63	Fragmented BUSCOs (F)                     |
+	|19	Missing BUSCOs (M)                        |
+	|124	Total BUSCO groups searched               |
+	--------------------------------------------------
+
+	--------------------------------------------------
+	|Results from dataset pseudomonadales_odb10       |
+	--------------------------------------------------
+	|C:33.8%[S:33.8%,D:0.0%],F:18.8%,M:47.4%,n:782    |
+	|264	Complete BUSCOs (C)                       |
+	|264	Complete and single-copy BUSCOs (S)       |
+	|0	Complete and duplicated BUSCOs (D)        |
+	|147	Fragmented BUSCOs (F)                     |
+	|371	Missing BUSCOs (M)                        |
+	|782	Total BUSCO groups searched               |
+	--------------------------------------------------
+```
+
+Now the assembly improves up to 33.8 % completeness with more BUSCOs found. 
+
+**We can then use this final Medaka consensus assembly as our final bacterial draft genome to do produce some annotations and look for interesting metabolic features.**
+
+
+6. Finally, remeber to copy all the results back to the $SCRATCH. 
+But let's first get rid of the original contigs, reads and busco_downloads directories to not duplicate data and save disk space:
+
+```console
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 SalmonBacteria.medaka.out]$ rm -r busco_downloads/
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 SalmonBacteria.medaka.out]$ cd ..
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ rm -r *corrected*gz *.contigs.fasta busco_downloads
+```
+Then copy all the data to the $SCRATCH, clean the workdirectory and exit the job:
+
+```console
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ cp -r working.dir.12724085/ $SCRATCH/GenomeAssemblyBio326/CANU.Assembly.dir/SalmonBacteria.canu.dir
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ cd ..
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ rm -r working.dir.12724085/
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ exit
+```
+Now just rename the working.dir to a something more useful:
+
+```console
+[bio326-21-0@login SalmonBacteria.canu.dir]$ mv working.dir.12724085/ Polishing.dir
+```
+
 
 
