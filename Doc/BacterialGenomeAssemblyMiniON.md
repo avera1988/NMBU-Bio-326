@@ -844,8 +844,9 @@ SalmonBacteria.canu.contigs.fasta  SalmonBacteria.canu.correctedReads.fasta.gz  
 7. Let's create a working directory and move our data there to keep this job tidy
 
 ```console
-(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ mv -t working.dir.12724085/ *.fasta *.gz 
-(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ cd working.dir.12724085/
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ mkdir working.dir.$SLURM_JOB_ID
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ mv -t working.dir.$SLURM_JOB_ID/ *.fasta *.gz 
+(/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ cd working.dir.$SLURM_JOB_ID/
 (/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ ls
 SalmonBacteria.canu.contigs.fasta  SalmonBacteria.canu.correctedReads.fasta.gz
 ```
