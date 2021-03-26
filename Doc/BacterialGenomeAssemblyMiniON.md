@@ -1175,7 +1175,7 @@ But let's first get rid of the original contigs, reads and busco_downloads direc
 (/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 SalmonBacteria.medaka.out]$ cd ..
 (/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 working.dir.12724085]$ rm -r *corrected*gz *.contigs.fasta busco_downloads
 ```
-Then copy all the data to the $SCRATCH, clean the workdirectory and exit the job:
+Then copy all the data to the $SCRATCH, clean the $TMPDIR/$USER folder and exit the job:
 
 ```console
 (/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/ONPTools) [bio326-21-0@cn-17 bio326-21-0]$ cp -r working.dir.12724085/ $SCRATCH/GenomeAssemblyBio326/CANU.Assembly.dir/SalmonBacteria.canu.dir
