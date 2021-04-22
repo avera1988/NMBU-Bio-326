@@ -354,7 +354,7 @@ date
 As always you can copy and paste this script from here or from ```/mnt/SCRATCH/bio326-21/MetaGenomeBinning/gtdbk.classifywf.SLURM.sh```. So if you have not produced the GTDBTK result copy the gtdbtk SLURM script and run it as follow:
 
 ```
-[bio326-21-0@login MetagenomicMAGS]$ sbatch gtdbk.classifywf.SLURM.sh GoodQualityMAGs fa
+[bio326-21-0@login MetagenomicMAGS]$ sbatch gtdbk.classifywf.SLURM.sh /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/GoodQualityMAGs/GoodQualityMAGs fa
 ```
 
 This will produce the ```MAGs_gtdbk.dir```. *GTDBTK takes >~ 45 min to analyze the MAGs, you either wait or can copy the MAGS_gtdbtk.dir to your folder by  ```cp -r /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/MAGs_gtdbk.dir .```*
@@ -488,6 +488,19 @@ Basically the software only needs the fasta files, the checkM result and the Tax
 #SBATCH --partition=smallmem
 
 ###########################################################
+###Basic usage help for this script#######
+
+print_usage() {
+        echo "Usage: sbatch $0 inputdir trans_table gtdbtk.tsv checkm.tsv"
+        echo "eg: sbatch $0 MAGS 11 gtdbtk.bac120.summary.tsv ONT.tsv"
+}
+
+if [ $# -le 1 ]
+        then
+                print_usage
+                exit 1
+        fi
+
 
 ## Set up job environment:
 
@@ -497,8 +510,6 @@ module load Miniconda3
 ##Activate conda environments
 
 export PS1=\$
-
-##DRAM is at /mnt/users/auve/mycondaenvs/DRAM
 
 source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM
 
@@ -601,4 +612,16 @@ rm -r tmpDir_of.$SLURM_JOB_ID.$input
 echo "I've done at"
 date
 ```
+**You can copy this script to your folder by: ```cp /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/dram.GTDB.CM.SLURM.sh .```**
+
+Let's run DRAM:
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MetagenomicMAGS]$ sbatch dram.GTDB.CM.SLURM.sh GoodQualityMAGs 11 gtdbk.classifywf.SLURM.sh ONT_qa_bins.tsv
+```
+
+
+*DRAM took > 3 hrs to annotate all the genomes but you can obtain a copy of the results by 
+
+
 
