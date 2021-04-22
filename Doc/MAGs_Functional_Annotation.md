@@ -154,14 +154,13 @@ ONT_bin.9	k__Bacteria (UID203)	5449	104	58	8.62	0.00	0.00	382818	0	6	6	65540	655
 So for filtering we need to select all genomes that have a *Completeness*(colum6) >= 70 and *Contamination	Strain* (colum 7). For this conditionals loops we can use the AWK that is a programming language for data extraction and reporting tool. The goal of this course is not to learn AWK so just let's talk about the basics: 
 * $ are references to colums (e.g. $6 meand colum 6)
 * -F Command line option to specify input field delimiter (e.g. -F "\t" means the text is separated by tabs)
-* awk '/pattern/ {action}' file↵Execute action for matched pattern 'pattern' on file 'file' (e.g awk -F "\t" '{if($6 > 70) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv means if colum 6 is greather than 70 print col.1 (ID), col.6(completeness) and col.7(Contamination)... 
+* awk '/pattern/ {action}' file↵Execute action for matched pattern 'pattern' on file 'file' (e.g awk -F "\t" '{if($6 >= 70 && $7 <= 5) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv means if colum 6 is greather than 70 and colum 7 is lower than 5 print: col.1 (ID), col.6(completeness) and col.7(Contamination), all separated by tabs ("\t")... 
 * This [cheatsheet](https://www.shortcutfoo.com/app/dojos/awk/cheatsheet) is a useful resource if you are interested in learn a bit more. 
 
 After this, let's filtering:
 
 ```bash
-(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ awk -F "\t" '{if($6 > 70) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv
-Bin Id	Completeness	Contamination
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ awk -F "\t" '{if($6 >= 70 && $7 <= 5) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv
 ONT_bin.1	97.99	2.85
 ONT_bin.2	81.93	0.46
 ONT_bin.3	98.67	1.27
@@ -169,7 +168,28 @@ ONT_bin.7	99.13	0.75
 ONT_bin.8	72.07	0.00
 ```
 
-After printing this we notice the 
+After printing this we notice that five bins matches our quality filter condition. We then can move these MAGs to a new folder, let's named GoodQualityMAGs
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ mkdir GoodQualityMAGs
+```
+
+And then whe need to move all these five MAGs to that folder. We can do it manually, but we are a bioinformaticians, so let's use the computer to move this. For doing that we need to read the first colum (genome ID) and copy those genomes to the new folder GoodQualityMAGs. The best way to do this is by using a *while* loop, this loop needs to read (-r read) the first colum after awk and copy that column (we are naming a line) to the folder (GoodQualityMAGs). **So far our awk prints 3 colums but for the loop we only need the column 1 ($1) so we need to modify the awk first and then apply the loop. Remember that the name of the file is the name in the column 1 plus extension .fa so we also need to indicate this in the loop:**
+
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ awk -F "\t" '{if($6 >= 70 && $7 <= 5) print $1}' ONT_qa_bins.tsv| while read -r line; do cp $line.fa GoodQualityMAGs/;done
+[bio326-21-0@cn-16 MetagenomicMAGS]$ cd GoodQualityMAGs/
+[bio326-21-0@cn-16 GoodQualityMAGs]$ ls
+ONT_bin.1.fa  ONT_bin.2.fa  ONT_bin.3.fa  ONT_bin.7.fa  ONT_bin.8.fa
+```
+
+**By applying this loop we were able to get all the genomes in the same folder at once. Try the loop if no do no panic, you can copy these genomes one by one using the normal cp command**
+
+
+
+
+
 
 
 
