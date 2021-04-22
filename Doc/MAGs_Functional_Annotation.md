@@ -177,18 +177,18 @@ After printing this we notice that five bins matches our quality filter conditio
 And then whe need to move all these five MAGs to that folder. We can do it manually, but we are a bioinformaticians, so let's use the computer to move this. For doing that we need to read the first colum (genome ID) and copy those genomes to the new folder GoodQualityMAGs. 
 
 The best way to do this is by using a *while* loop:
-* A basic example of while loop for reading "lines" is: 
+* A basic example of while loop for reading "lines" in a file and print those lines (echo) to the standar ouput (screen) is: 
 ``` bash
 cat file.txt | while read line; do
   echo $line
 done
 ```
 
-* This loop needs to read (-r read) the first colum after awk and copy that column (we are naming a line) to the folder (GoodQualityMAGs). **So far our awk prints 3 colums but for the loop we only need the column 1 ($1) so we need to modify the awk first and then apply the loop. Remember that the name of the file is the name in the column 1 plus extension .fa so we also need to indicate this in the loop:**
+* In our specific case, the while loop needs to read (using the command *read*) the first colum after awk and copy (cp) that line (each line in the colum 1) to the folder (GoodQualityMAGs). **So far our awk prints 3 colums but for the loop we only need the column 1 ($1) so we need to modify the awk first and then apply the loop. Remember that the name of the file is the name in the column 1 plus the extension .fa so we also need to indicate this in the loop:**
 
 
 ```bash
-(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ awk -F "\t" '{if($6 >= 70 && $7 <= 5) print $1}' ONT_qa_bins.tsv| while read -r line; do cp $line.fa GoodQualityMAGs/;done
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ awk -F "\t" '{if($6 >= 70 && $7 <= 5) print $1}' ONT_qa_bins.tsv| while read line; do cp $line.fa GoodQualityMAGs/;done
 [bio326-21-0@cn-16 MetagenomicMAGS]$ cd GoodQualityMAGs/
 [bio326-21-0@cn-16 GoodQualityMAGs]$ ls
 ONT_bin.1.fa  ONT_bin.2.fa  ONT_bin.3.fa  ONT_bin.7.fa  ONT_bin.8.fa
@@ -208,8 +208,7 @@ Now that we have this we can start the annotation using DRAM.
 ## DRAM: Distilled and Refined Annotation of Metabolism
 
 "[DRAM](https://github.com/shafferm/DRAM#dram) (Distilled and Refined Annotation of Metabolism) is a tool for annotating metagenomic assembled genomes and VirSorter identified viral contigs. DRAM annotates MAGs and viral contigs using KEGG (if provided by the user), UniRef90, PFAM, dbCAN, RefSeq viral, VOGDB and the MEROPS peptidase database as well as custom user databases..."
- 
-
+ ![dramaanot](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAM.jpg)
 
 
 
