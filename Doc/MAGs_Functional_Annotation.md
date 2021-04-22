@@ -211,7 +211,7 @@ Now that we have this we can start the annotation using DRAM.
  ![dramaanot](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAM.jpg)
 
 
-Until now we have the MAGs, the checkM results and last [session](https://github.com/liveha/NMBU-BIO326/blob/main/Binning_metaBAT.md) we learned how to use [GTDBTK](https://github.com/Ecogenomics/GTDBTk) fro taxonomic classification. But we can run GTDBTK again using only the "GoodQuality" MAGs now. For this we need the script gtdbk.classifywf.SLURM.sh 
+Until now we have the MAGs, the checkM results and last [session](https://github.com/liveha/NMBU-BIO326/blob/main/Binning_metaBAT.md) we learned how to use [GTDBTK](https://github.com/Ecogenomics/GTDBTk) for taxonomic classification. But we can run GTDBTK again using only the "GoodQuality" MAGs now. For this we need the script gtdbk.classifywf.SLURM.sh 
 
 ```bash
 #!/bin/bash
@@ -382,14 +382,14 @@ ONT_bin.8	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannere
 
 ```
 
-This is a **HUGE** file and is quite confusing so just let's take a closser look into the header:
+This is a **HUGE** file and is quite confusing so just let's take a closer look into the header:
 
 ```bash
 [bio326-21-0@login MAGs_gtdbk.dir]$ head -1 gtdbtk.bac120.summary.tsv
 user_genome	classification	fastani_reference	fastani_reference_radius	fastani_taxonomy	fastani_ani	fastani_af	closest_placement_reference	closest_placement_radius	closest_placement_taxonomy	closest_placement_ani	closest_placement_af	pplacer_taxonomy	classification_method	note	other_related_references(genome_id,species_name,radius,ANI,AF)	msa_percent	translation_table	red_value	warnings
 ```
 
-The columns describing the genome id, taxonomy classification and ANI are 1, 2 and 6, we can pars this to have a more tidy useful table by "cutting" the colums 1, 2 and 6 using the *cut* command:
+The columns describing the genome id, taxonomy classification and ANI are 1, 2 and 6, we can pars this to have a more tidy useful table by "cutting" the columns 1, 2 and 6 using the *cut* command:
 
 ```bash
 [bio326-21-0@login MAGs_gtdbk.dir]$ cat gtdbtk.bac120.summary.tsv |cut -f 1,2,6
@@ -400,11 +400,11 @@ ONT_bin.3	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Lachnospirales;f__Lachnos
 ONT_bin.7	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides intestinalis_A	97.03
 ONT_bin.8	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannerellaceae;g__Parabacteroides;s__Parabacteroides distasonis	98.42
 ```
-Most of the MAGs have a closest refrence species in the database with ANI values > 97 %, so we can say that these are the same bacterial species. And all of them are human associated bacteria....
+*Most of the MAGs have the closest reference species in the database with ANI values > 97 %, so we can say that these MAGs are the same bacterial species as those previously described in the database. And all of them seem to be human gut-associated bacteria...*
 
 ### We have now all the imputs for DRAM. Let's see what does DRAM need to run. 
 
-1. DRAM is installed as a conda environment we need to activate first:
+1. DRAM is installed as a conda environment we need to activate this first:
 
 ```bash
 [bio326-21-0@login MAGs_gtdbk.dir]$ module load Miniconda3 
@@ -430,11 +430,11 @@ optional arguments:
   -h, --help            show this help message and exit
   ```
 
-This is a multimodular software: 
+This is a multi-modular software: 
 
 ![DRAMTOTAL](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAMtotal.jpg)
 
-We need to run the annotation and then DRAM is capable to extract and classify Metabolic trends (e.g carbohydrate active enzymes (CAZy) coding genes) and produce vizual plots with the disill command.
+We need to run the annotation and then DRAM is capable to extract and classify Metabolic trends (e.g carbohydrate active enzymes (CAZy) coding genes) and produce visual plots with the disill command.
 
 Let's display the help of these two commands:
 
@@ -451,7 +451,7 @@ usage: DRAM.py distill [-h] [-i INPUT_FILE] [-o OUTPUT_DIR] [--rrna_path RRNA_PA
                        [--distillate_gene_names] [--genomes_per_product GENOMES_PER_PRODUCT]
 ```
 
-Basically the software only needs the fasta files, the checkM result and the Taxonomy. Then Distill needs the annotations from DRAM annotate to produce the plots. The following is an script for running both the annotation and the distill part:
+Basically the software only needs the fasta files, the checkM result and the Taxonomy. Then Distill needs the annotations from DRAM annotate to produce the summary tables and plots. The following is an script for running both the annotation and the distill part:
 
 ```bash
 #!/bin/bash
