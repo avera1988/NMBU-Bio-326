@@ -434,8 +434,171 @@ This is a multimodular software:
 
 ![DRAMTOTAL](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAMtotal.jpg)
 
+We need to run the annotation and then DRAM is capable to extract and classify Metabolic trends (e.g carbohydrate active enzymes (CAZy) coding genes) and produce vizual plots with the disill command.
+
+Let's display the help of these two commands:
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MAGs_gtdbk.dir]$ DRAM.py annotate --help
+usage: DRAM.py annotate [-h] -i INPUT_FASTA [-o OUTPUT_DIR] [--min_contig_size MIN_CONTIG_SIZE] [--prodigal_mode {train,meta,single}]
+                        [--trans_table {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}] [--bit_score_threshold BIT_SCORE_THRESHOLD]
+                        [--rbh_bit_score_threshold RBH_BIT_SCORE_THRESHOLD] [--custom_db_name CUSTOM_DB_NAME] [--custom_fasta_loc CUSTOM_FASTA_LOC] [--gtdb_taxonomy GTDB_TAXONOMY]
+                        [--checkm_quality CHECKM_QUALITY] [--use_uniref] [--low_mem_mode] [--skip_trnascan] [--keep_tmp_dir] [--threads THREADS] [--verbose]
+ 
+
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MAGs_gtdbk.dir]$ DRAM.py distill --help
+usage: DRAM.py distill [-h] [-i INPUT_FILE] [-o OUTPUT_DIR] [--rrna_path RRNA_PATH] [--trna_path TRNA_PATH] [--groupby_column GROUPBY_COLUMN] [--custom_distillate CUSTOM_DISTILLATE]
+                       [--distillate_gene_names] [--genomes_per_product GENOMES_PER_PRODUCT]
+```
+
+Basically the software only needs the fasta files, the checkM result and the Taxonomy. Then Distill needs the annotations from DRAM annotate to produce the plots. The following is an script for running both the annotation and the distill part:
+
+```bash
+#!/bin/bash
+#########################################################################
+#	SLURM scrip for running DRAM annotator on Orion cluster
+#		Dependencies: 
+#					  DRAM conda environment (/mnt/auve/mycondaenvs/DRAM)
+#	gtdbtk.bac120.summary.tsv For taxonomy annotation
+#	results.tsv	CheckM results for quality annotation
+#
+#	This script copies all the MAGs to a local disk on any Orion's node 
+#	and runs locally on the node. At the end it copies all the results to the PEP
+#	or any other path in the cluster into a DRAM.Results.dir folder.
+#
+#	to run: 
+# sbatch  dram.GTDB.CM.SLURM.sh inputdir trans_table gtdbtk.tsv checkm.tsv
+#eg: sbatch  dram.GTDB.CM.SLURM.sh MAGS 11 gtdbtk.bac120.summary.tsv ONT.tsv
+#
+# Author: Arturo Vera
+# April 2021
+#########################################################################
+
+###############SLURM SCRIPT###################################
+
+## Job name:
+#SBATCH --job-name=DRAM
+#
+## Wall time limit:
+#SBATCH --time=24:00:00
+#
+## Other parameters:
+#SBATCH --cpus-per-task 12
+#SBATCH --mem=20G
+#SBATCH --partition=smallmem
+
+###########################################################
+
+## Set up job environment:
+
+module --quiet purge  # Reset the modules to the system default
+module load Miniconda3
+
+##Activate conda environments
+
+export PS1=\$
+
+##DRAM is at /mnt/users/auve/mycondaenvs/DRAM
+
+source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM
+
+####Do some work:########
+
+## For debuggin
+echo "Hello" $USER
+echo "my submit directory is:"
+echo $SLURM_SUBMIT_DIR
+echo "this is the job:"
+echo $SLURM_JOB_ID
+echo "I am running on:"
+echo $SLURM_NODELIST
+echo "I am running with:"
+echo $SLURM_CPUS_ON_NODE "cpus"
+echo "Today is:"
+date
+
+##Variables
+
+input=$1 #Directory with genomes
+trans_table=$2 #Translation table used by prodigal
+gtdbtk=$3 #gtdbtk results table .tsv
+checkm=$4 #checkm results table .tsv
 
 
+## Copying data to local node for faster computation
+
+cd $TMPDIR
+
+#Check if $USER exists in $TMPDIR
+
+if [[ -d $USER ]]
+	then
+        	echo "$USER exists on $TMPDIR"
+	else
+        	mkdir $USER
+fi
 
 
+echo "copying files to" $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID
+
+cd $USER
+mkdir tmpDir_of.$SLURM_JOB_ID
+cd tmpDir_of.$SLURM_JOB_ID
+
+#Copy the MAGs to the $TMPDIR
+
+echo "copying MAGs to" $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID
+
+cp -r $SLURM_SUBMIT_DIR/$input .
+cp -r $SLURM_SUBMIT_DIR/$gtdbtk .
+cp -r $SLURM_SUBMIT_DIR/$checkm .
+
+echo "This are the files:"
+ls -1
+
+##################DRAM##############################
+
+echo "DRAM started at"
+date +%d\ %b\ %T
+
+time DRAM.py annotate \
+-i $input'/*.fasta' \
+--trans_table $trans_table \
+--gtdb_taxonomy $gtdbtk   \
+--checkm_quality $checkm \
+-o dram.annotation.$input.dir \
+--threads $SLURM_CPUS_ON_NODE
+
+echo "Distilling..."
+
+time DRAM.py distill \
+-i dram.annotation.$input.dir/annotations.tsv \
+-o dram.genome_summaries.$input.dir \
+--trna_path dram.annotation.$input.dir/trnas.tsv \
+--rrna_path dram.annotation.$input.dir/rrnas.tsv
+
+echo "DRAM finished at"
+date +%d\ %b\ %T
+
+mkdir DRAM.Results.$input.dir
+mv dram.annotation.$input.dir DRAM.Results.$input.dir
+mv dram.genome_summaries.$input.dir DRAM.Results.$input.dir
+###########Moving results to PEP partition or anywhere the main script was submitted############
+
+echo "moving results to" $SLURM_SUBMIT_DIR/$input
+
+cd $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID.$input
+
+time cp -r *.dir $SLURM_SUBMIT_DIR/$input
+
+echo "DRAM results are in: " $SLURM_SUBMIT_DIR/$input/DRAM.Results.dir.$input.dir
+
+####removing tmp dir. Remember to do this for not filling the HDD in the node!!!!###
+
+cd $TMPDIR/$USER/
+rm -r tmpDir_of.$SLURM_JOB_ID.$input
+
+echo "I've done at"
+date
+```
 
