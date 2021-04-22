@@ -650,8 +650,7 @@ The files have different information:
 
 All these files are vizual friendly, so it is recomendable to export this data to our personal computers and take a look. **A guide on how to copy files from Orion to our personal computers can be find in the [BacterialGenomeAssemblyMiniON](https://github.com/avera1988/NMBU-Bio-326/blob/main/Doc/BacterialGenomeAssemblyMiniON.md) document.
 
-
-
+Once in your computer, you can open the product.html, to explore the metabolic potential of your MAGs.
 
 
 
