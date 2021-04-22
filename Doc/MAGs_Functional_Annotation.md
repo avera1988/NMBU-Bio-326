@@ -389,17 +389,18 @@ This is a **HUGE** file and is quite confusing so just let's take a closser look
 user_genome	classification	fastani_reference	fastani_reference_radius	fastani_taxonomy	fastani_ani	fastani_af	closest_placement_reference	closest_placement_radius	closest_placement_taxonomy	closest_placement_ani	closest_placement_af	pplacer_taxonomy	classification_method	note	other_related_references(genome_id,species_name,radius,ANI,AF)	msa_percent	translation_table	red_value	warnings
 ```
 
-The columns describing the genome id and taxonomy classification are 1 and 2, we can pars this to have a more tidy useful table by "cutting" the colums 1 and 2 using the *cut* command:
+The columns describing the genome id, taxonomy classification and ANI are 1, 2 and 6, we can pars this to have a more tidy useful table by "cutting" the colums 1, 2 and 6 using the *cut* command:
 
 ```bash
-[bio326-21-0@login MAGs_gtdbk.dir]$ cat gtdbtk.bac120.summary.tsv |cut -f 1,2
-user_genome	classification
-ONT_bin.1	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Monoglobales_A;f__UBA1381;g__CAG-41;s__CAG-41 sp900066215
-ONT_bin.2	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides thetaiotaomicron
-ONT_bin.3	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Lachnospirales;f__Lachnospiraceae;g__Enterocloster;s__Enterocloster sp000155435
-ONT_bin.7	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides intestinalis_A
-ONT_bin.8	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannerellaceae;g__Parabacteroides;s__Parabacteroides distasonis
+[bio326-21-0@login MAGs_gtdbk.dir]$ cat gtdbtk.bac120.summary.tsv |cut -f 1,2,6
+user_genome	classification	fastani_ani
+ONT_bin.1	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Monoglobales_A;f__UBA1381;g__CAG-41;s__CAG-41 sp900066215	98.76
+ONT_bin.2	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides thetaiotaomicron	97.92
+ONT_bin.3	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Lachnospirales;f__Lachnospiraceae;g__Enterocloster;s__Enterocloster sp000155435	98.63
+ONT_bin.7	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides intestinalis_A	97.03
+ONT_bin.8	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannerellaceae;g__Parabacteroides;s__Parabacteroides distasonis	98.42
 ```
+Most of the MAGs have a closest refrence species in the database with ANI values > 97 %, so we can say that these are the same bacterial species. And all of them are human associated bacteria....
 
 ### We have now all the imputs for DRAM. Let's see what does DRAM need to run. 
 
@@ -429,7 +430,9 @@ optional arguments:
   -h, --help            show this help message and exit
   ```
 
-This is a multimodular software: ![DRAMTOTAL](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAMtotal.jpg)
+This is a multimodular software: 
+
+![DRAMTOTAL](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAMtotal.jpg)
 
 
 
