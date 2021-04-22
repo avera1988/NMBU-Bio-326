@@ -211,7 +211,7 @@ Now that we have this we can start the annotation using DRAM.
  ![dramaanot](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAM.jpg)
 
 
-Until now we have the MAGs, the checkM results and last [session](https://github.com/liveha/NMBU-BIO326/blob/main/Binning_metaBAT.md) we learned how to use [GTDBTK](https://github.com/Ecogenomics/GTDBTk). But we can run GTDBTK again using only the "GoodQuality" MAGs now. For this we need the script gtdbk.classifywf.SLURM.sh 
+Until now we have the MAGs, the checkM results and last [session](https://github.com/liveha/NMBU-BIO326/blob/main/Binning_metaBAT.md) we learned how to use [GTDBTK](https://github.com/Ecogenomics/GTDBTk) fro taxonomic classification. But we can run GTDBTK again using only the "GoodQuality" MAGs now. For this we need the script gtdbk.classifywf.SLURM.sh 
 
 ```bash
 #!/bin/bash
