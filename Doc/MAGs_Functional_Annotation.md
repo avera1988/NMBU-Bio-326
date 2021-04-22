@@ -620,7 +620,7 @@ date
 Let's run DRAM:
 
 ```bash
-(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MetagenomicMAGS]$ sbatch dram.GTDB.CM.SLURM.sh GoodQualityMAGs 11 gtdbk.classifywf.SLURM.sh ONT_qa_bins.tsv
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MetagenomicMAGS]$ sbatch dram.GTDB.CM.SLURM.sh GoodQualityMAGs fa 11 gtdbk.classifywf.SLURM.sh ONT_qa_bins.tsv
 ```
 
 
