@@ -467,8 +467,8 @@ Basically the software only needs the fasta files, the checkM result and the Tax
 #	or any other path in the cluster into a DRAM.Results.dir folder.
 #
 #	to run: 
-# sbatch  dram.GTDB.CM.SLURM.sh inputdir trans_table gtdbtk.tsv checkm.tsv
-#eg: sbatch  dram.GTDB.CM.SLURM.sh MAGS 11 gtdbtk.bac120.summary.tsv ONT.tsv
+# sbatch  dram.GTDB.CM.SLURM.sh inputdir extension_of_fasta_files trans_table gtdbtk.tsv checkm.tsv
+#eg: sbatch  dram.GTDB.CM.SLURM.sh MAGS fa 11 gtdbtk.bac120.summary.tsv ONT.tsv
 #
 # Author: Arturo Vera
 # April 2021
@@ -488,11 +488,12 @@ Basically the software only needs the fasta files, the checkM result and the Tax
 #SBATCH --partition=smallmem
 
 ###########################################################
+
 ###Basic usage help for this script#######
 
 print_usage() {
-        echo "Usage: sbatch $0 inputdir trans_table gtdbtk.tsv checkm.tsv"
-        echo "eg: sbatch $0 MAGS 11 gtdbtk.bac120.summary.tsv ONT.tsv"
+        echo "Usage: sbatch $0 inputdir extension_of_fasta_files trans_table gtdbtk.tsv checkm.tsv"
+        echo "eg: sbatch $0 MAGS fa 11 gtdbtk.bac120.summary.tsv ONT.tsv"
 }
 
 if [ $# -le 1 ]
@@ -510,7 +511,6 @@ module load Miniconda3
 ##Activate conda environments
 
 export PS1=\$
-
 source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM
 
 ####Do some work:########
@@ -531,9 +531,10 @@ date
 ##Variables
 
 input=$1 #Directory with genomes
-trans_table=$2 #Translation table used by prodigal
-gtdbtk=$3 #gtdbtk results table .tsv
-checkm=$4 #checkm results table .tsv
+ext=$2 #extention of the fasta files eg. .fa
+trans_table=$3 #Translation table used by prodigal
+gtdbtk=$4 #gtdbtk results table .tsv
+checkm=$5 #checkm results table .tsv
 
 
 ## Copying data to local node for faster computation
@@ -573,7 +574,7 @@ echo "DRAM started at"
 date +%d\ %b\ %T
 
 time DRAM.py annotate \
--i $input'/*.fasta' \
+-i $input'/*.'$ext \
 --trans_table $trans_table \
 --gtdb_taxonomy $gtdbtk   \
 --checkm_quality $checkm \
@@ -594,11 +595,12 @@ date +%d\ %b\ %T
 mkdir DRAM.Results.$input.dir
 mv dram.annotation.$input.dir DRAM.Results.$input.dir
 mv dram.genome_summaries.$input.dir DRAM.Results.$input.dir
+
 ###########Moving results to PEP partition or anywhere the main script was submitted############
 
 echo "moving results to" $SLURM_SUBMIT_DIR/$input
 
-cd $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID.$input
+cd $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID
 
 time cp -r *.dir $SLURM_SUBMIT_DIR/$input
 
@@ -607,10 +609,11 @@ echo "DRAM results are in: " $SLURM_SUBMIT_DIR/$input/DRAM.Results.dir.$input.di
 ####removing tmp dir. Remember to do this for not filling the HDD in the node!!!!###
 
 cd $TMPDIR/$USER/
-rm -r tmpDir_of.$SLURM_JOB_ID.$input
+rm -r tmpDir_of.$SLURM_JOB_ID
 
 echo "I've done at"
 date
+
 ```
 **You can copy this script to your folder by: ```cp /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/dram.GTDB.CM.SLURM.sh .```**
 
