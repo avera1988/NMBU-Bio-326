@@ -351,7 +351,13 @@ rm -r tmpDir_of.$SLURM_JOB_ID
 echo "I've done at"
 date
 ```
+As always you can copy and paste this script from here or from ```/mnt/SCRATCH/bio326-21/MetaGenomeBinning/gtdbk.classifywf.SLURM.sh```. So if you have not produced the GTDBTK result copy this script and run it as follow:
 
+```
+[bio326-21-0@login MetagenomicMAGS]$ sbatch gtdbk.classifywf.SLURM.sh GoodQualityMAGs fa
+```
+
+This will produce the ```MAGs_gtdbk.dir``` 
 
 
 
