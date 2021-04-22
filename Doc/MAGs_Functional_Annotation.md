@@ -151,7 +151,7 @@ ONT_bin.8	o__Bacteroidales (UID2621)	198	427	260	72.07	0.00	0.00	3472450	0	25	25
 ONT_bin.9	k__Bacteria (UID203)	5449	104	58	8.62	0.00	0.00	382818	0	6	6	65540	65540	63803	63803	130590	130590	42.3	0.99	91.0711	297	99	5	0	0	0	0
 
 ```
-So for filtering we need to select all genomes that have a *Completeness*(colum6) >= 70 and *Contamination	Strain* (colum 7). For this conditionals loops we can use the AWK that is a programming language for data extraction and reporting tool. The goal of this course is not to learn AWK so just let's talk about the basics: 
+4. So for filtering we need to select all genomes that have a *Completeness*(colum6) >= 70 and *Contamination	Strain* (colum 7). For this conditionals loops we can use the AWK that is a programming language for data extraction and reporting tool. The goal of this course is not to learn AWK so just let's talk about the basics: 
 * $ are references to colums (e.g. $6 meand colum 6)
 * -F Command line option to specify input field delimiter (e.g. -F "\t" means the text is separated by tabs)
 * awk '/pattern/ {action}' file↵Execute action for matched pattern 'pattern' on file 'file' (e.g awk -F "\t" '{if($6 >= 70 && $7 <= 5) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv means if colum 6 is greather than 70 and colum 7 is lower than 5 print: col.1 (ID), col.6(completeness) and col.7(Contamination), all separated by tabs ("\t")... 
@@ -187,7 +187,22 @@ The best way to do this is by using a *while* loop:
 ONT_bin.1.fa  ONT_bin.2.fa  ONT_bin.3.fa  ONT_bin.7.fa  ONT_bin.8.fa
 ```
 
-**By applying this loop we were able to get all the genomes in the same folder at once. Try the loop if no don't panic, you can copy these genomes one by one using the normal cp command 😊**
+6. **By applying this loop we were able to get all the genomes in the same folder at once. Try the loop if no don't panic, you can copy these genomes one by one using the normal cp command 😊**
+
+We can exit now the interactive job:
+
+```bash
+[bio326-21-0@cn-16 GoodQualityMAGs]$ exit
+exit
+```
+
+Now that we have this we can start the annotation using DRAM.
+
+## DRAM: Distilled and Refined Annotation of Metabolism
+
+"[DRAM](https://github.com/shafferm/DRAM#dram) (Distilled and Refined Annotation of Metabolism) is a tool for annotating metagenomic assembled genomes and VirSorter identified viral contigs. DRAM annotates MAGs and viral contigs using KEGG (if provided by the user), UniRef90, PFAM, dbCAN, RefSeq viral, VOGDB and the MEROPS peptidase database as well as custom user databases..."
+ 
+
 
 
 
