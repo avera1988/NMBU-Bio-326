@@ -95,7 +95,44 @@ checkM_results  ONT_bin.1.fa  ONT_bin.2.fa  ONT_bin.3.fa  ONT_bin.4.fa  ONT_bin.
 ```
 *Remember to change your paths and directories to your user name*
 
-3. Now let's run again the ```checkm qa``` pipeline but indicating we want to print a *table separated values* file with the quality scores. How we obtain that, let's take a look into the checkm qa options:
+3. Now let's run again the ```checkm qa``` pipeline but indicating we want to print a *table separated values* file with the quality scores. How do we obtain that?, let's take a look into the checkm qa options. **We have installed a conda environment with checkM ```/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM```, just due to some times conda envrironments are faster that singularity containers. So we need to first load that environment**
+
+```
+[bio326-21-0@cn-16 MetagenomicMAGS]$ source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ checkm qa --help
+usage: checkm qa [-h] [-o {1,2,3,4,5,6,7,8,9}]
+                 [--exclude_markers EXCLUDE_MARKERS] [--individual_markers]
+                 [--skip_adj_correction] [--skip_pseudogene_correction]
+                 [--aai_strain AAI_STRAIN] [-a ALIGNMENT_FILE]
+                 [--ignore_thresholds] [-e E_VALUE] [-l LENGTH]
+                 [-c COVERAGE_FILE] [-f FILE] [--tab_table] [-t THREADS] [-q]
+                 [--tmpdir TMPDIR]
+                 marker_file analyze_dir
+
+Assess bins for contamination and completeness.
+                                        
+```
+**The option we need is --tab_table and -f to save this into a file and not just printed to the standar input. We need the checkM results folder and the marker_files**
+```
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ checkm \
+ qa \
+ checkM_results/lineage.ms \
+ -t $SLURM_CPUS_ON_NODE \
+ checkM_results \
+ -o 2 \
+ --tab_table \
+-f ONT_qa_bins.tsv
+[2021-04-22 15:56:57] INFO: CheckM v1.1.3
+[2021-04-22 15:56:57] INFO: checkm qa checkM_results/lineage.ms -t 2 checkM_results -o 2 --tab_table -f ONT_qa_bins.tsv
+[2021-04-22 15:56:57] INFO: [CheckM - qa] Tabulating genome statistics.
+[2021-04-22 15:56:57] INFO: Calculating AAI between multi-copy marker genes.
+[2021-04-22 15:56:57] INFO: Reading HMM info from file.
+[2021-04-22 15:56:57] INFO: Parsing HMM hits to marker genes:
+    Finished parsing hits for 9 of 9 (100.00%) bins.
+[2021-04-22 15:57:00] INFO: QA information written to: ONT_qa_bins.tsv
+[2021-04-22 15:57:00] INFO: { Current stage: 0:00:02.594 || Total: 0:00:02.594 }
+
+```
 
 
 
