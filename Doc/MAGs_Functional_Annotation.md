@@ -621,7 +621,9 @@ Let's run DRAM:
 ```
 
 
-*DRAM took > 3 hrs to annotate all the genomes but you can obtain a copy of the results by 
+*DRAM took > 3 hrs to annotate all the genomes but you can obtain a copy of the results by ```cp -r /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/DRAM.Results.GoodQualityMAGs.dir .```*
+
+
 
 
 
