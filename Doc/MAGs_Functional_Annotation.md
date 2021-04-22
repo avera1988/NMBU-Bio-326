@@ -357,7 +357,7 @@ As always you can copy and paste this script from here or from ```/mnt/SCRATCH/b
 [bio326-21-0@login MetagenomicMAGS]$ sbatch gtdbk.classifywf.SLURM.sh GoodQualityMAGs fa
 ```
 
-This will produce the ```MAGs_gtdbk.dir```. *GTDBTK takes >~ 45 min to analyze the MAGs, you can copy the MAGS_gtdbtk.dir to your folder by  ```cp -r /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/MAGs_gtdbk.dir .```
+This will produce the ```MAGs_gtdbk.dir```. *GTDBTK takes >~ 45 min to analyze the MAGs, you either wait or can copy the MAGS_gtdbtk.dir to your folder by  ```cp -r /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/MAGs_gtdbk.dir .```*
 
 Let's take a look on the Results:
 
@@ -382,7 +382,7 @@ ONT_bin.8	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannere
 
 ```
 
-This is a HUGE file and is quite confusing so just let's take a closser look into the header:
+This is a **HUGE** file and is quite confusing so just let's take a closser look into the header:
 
 ```bash
 [bio326-21-0@login MAGs_gtdbk.dir]$ head -1 gtdbtk.bac120.summary.tsv
@@ -400,6 +400,37 @@ ONT_bin.3	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Lachnospirales;f__Lachnos
 ONT_bin.7	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides intestinalis_A
 ONT_bin.8	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannerellaceae;g__Parabacteroides;s__Parabacteroides distasonis
 ```
+
+### We have now all the imputs for DRAM. Let's see what does DRAM need to run. 
+
+1. DRAM is installed as a conda environment we need to activate first:
+
+```bash
+[bio326-21-0@login MAGs_gtdbk.dir]$ module load Miniconda3 
+[bio326-21-0@login MAGs_gtdbk.dir]$ source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MAGs_gtdbk.dir]$
+```
+
+2. Print the help of DRAM
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MAGs_gtdbk.dir]$ DRAM.py --help
+usage: DRAM.py [-h] {annotate,annotate_genes,distill,strainer,neighborhoods} ...
+
+positional arguments:
+  {annotate,annotate_genes,distill,strainer,neighborhoods}
+    annotate            Annotate genomes/contigs/bins/MAGs
+    annotate_genes      Annotate already called genes, limited functionality compared to annotate
+    distill             Summarize metabolic content of annotated genomes
+    strainer            Strain annotations down to genes of interest
+    neighborhoods       Find neighborhoods around genes of interest
+
+optional arguments:
+  -h, --help            show this help message and exit
+  ```
+
+This is a multimodular software: ![DRAMTOTAL](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAMtotal.jpg)
+
 
 
 
