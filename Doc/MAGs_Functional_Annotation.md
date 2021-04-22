@@ -652,6 +652,8 @@ All these files are vizual friendly, so it is recomendable to export this data t
 
 Once in your computer, you can open the product.html, to explore the metabolic potential of your MAGs.
 
+![dramhtml](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/dramhtml.png)
+
 
 
 
