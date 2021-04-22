@@ -654,7 +654,8 @@ Once in your computer, you can open the product.html, to explore the metabolic p
 
 ![dramhtml](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/dramhtml.png)
 
+is there any special metabolic pathway would you like to look on? Now is time for the funny part that is parsing the information ...
 
-
+### Enjoy DRAM and your annotated MAGs
 
 
