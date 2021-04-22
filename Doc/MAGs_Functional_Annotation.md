@@ -458,7 +458,7 @@ Basically the software only needs the fasta files, the checkM result and the Tax
 #########################################################################
 #	SLURM scrip for running DRAM annotator on Orion cluster
 #		Dependencies: 
-#					  DRAM conda environment (/mnt/auve/mycondaenvs/DRAM)
+#	DRAM conda environment
 #	gtdbtk.bac120.summary.tsv For taxonomy annotation
 #	results.tsv	CheckM results for quality annotation
 #
@@ -622,6 +622,36 @@ Let's run DRAM:
 
 
 *DRAM took > 3 hrs to annotate all the genomes but you can obtain a copy of the results by ```cp -r /mnt/SCRATCH/bio326-21-0/MetagenomicMAGS/DRAM.Results.GoodQualityMAGs.dir .```*
+
+Let's have a look of the DRAM results: 
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login MetagenomicMAGS]$ cd DRAM.Results.GoodQualityMAGs.dir/
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login DRAM.Results.GoodQualityMAGs.dir]$ ls
+dram.annotation.GoodQualityMAGs.dir  dram.genome_summaries.GoodQualityMAGs.dir
+```
+There are two directories: 
+* dram.annotation.GoodQualityMAGs.dir: It has all the "raw" annotations, gene sequeces, protein preditions of the MAG's
+* dram.genome_summaries.GoodQualityMAGs.dir: It has the destilled part of the genomes with the sorted metabolic functions
+
+
+Take a look into the summaries directory:
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login DRAM.Results.GoodQualityMAGs.dir]$ cd dram.genome_summaries.GoodQualityMAGs.dir/
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/DRAM) [bio326-21-0@login dram.genome_summaries.GoodQualityMAGs.dir]$ ls
+genome_stats.tsv  metabolism_summary.xlsx  product.html  product.tsv
+```
+The files have different information:
+
+* genome_stats.tsv: Basic annotaion stats of the genomes, as # of contigs/scaffolds, taxonomy, RNAgenes etc.
+* metabolism_summary.xlsx: An excel file with all the Metabolic summary in each genome.
+* product.html: Interactive heatmaps of the metabolic summaries
+* product.tsv: Tables to reproduce the heatmaps of above
+
+All these files are vizual friendly, so it is recomendable to export this data to our personal computers and take a look. **A guide on how to copy files from Orion to our personal computers can be find in the [BacterialGenomeAssemblyMiniON](https://github.com/avera1988/NMBU-Bio-326/blob/main/Doc/BacterialGenomeAssemblyMiniON.md) document.
+
+
+
 
 
 
