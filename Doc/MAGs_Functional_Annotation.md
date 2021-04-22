@@ -177,6 +177,13 @@ After printing this we notice that five bins matches our quality filter conditio
 And then whe need to move all these five MAGs to that folder. We can do it manually, but we are a bioinformaticians, so let's use the computer to move this. For doing that we need to read the first colum (genome ID) and copy those genomes to the new folder GoodQualityMAGs. 
 
 The best way to do this is by using a *while* loop:
+* A basic example of while loop for reading "lines" is: 
+``` bash
+cat file.txt | while read line; do
+  echo $line
+done
+```
+
 * This loop needs to read (-r read) the first colum after awk and copy that column (we are naming a line) to the folder (GoodQualityMAGs). **So far our awk prints 3 colums but for the loop we only need the column 1 ($1) so we need to modify the awk first and then apply the loop. Remember that the name of the file is the name in the column 1 plus extension .fa so we also need to indicate this in the loop:**
 
 
