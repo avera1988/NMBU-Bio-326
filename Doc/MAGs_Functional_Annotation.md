@@ -97,7 +97,7 @@ checkM_results  ONT_bin.1.fa  ONT_bin.2.fa  ONT_bin.3.fa  ONT_bin.4.fa  ONT_bin.
 
 3. Now let's run again the ```checkm qa``` pipeline but indicating we want to print a *table separated values* file with the quality scores. How do we obtain that?, let's take a look into the checkm qa options. **We have installed a conda environment with checkM ```/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM```, just due to some times conda envrironments are faster that singularity containers. So we need to first load that environment**
 
-```
+```bash
 [bio326-21-0@cn-16 MetagenomicMAGS]$ source activate /net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM
 (/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ checkm qa --help
 usage: checkm qa [-h] [-o {1,2,3,4,5,6,7,8,9}]
@@ -134,6 +134,38 @@ Assess bins for contamination and completeness.
 [2021-04-22 15:57:00] INFO: { Current stage: 0:00:02.594 || Total: 0:00:02.594 }
 
 ```
+
+This will provide us with a *ONT_qa_bins.tsv* file where all the qa results are storage. Let's take a look:
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ more ONT_qa_bins.tsv 
+Bin Id	Marker lineage	# genomes	# markers	# marker sets	Completeness	Contamination	Strain heterogeneity	Genome size (bp)	# ambiguous bases	# scaffolds	# contigs	N50 (scaffolds)	N50 (contigs)	Mean scaffold length (bp)	Mean contig length (bp)	Longest scaffold (bp)	Longest contig (bp)	GC	GC std (scaffolds > 1kbp)	Coding density	Translation table	# predicted genes	0	1	2	3	4	5+
+ONT_bin.1	o__Clostridiales (UID1212)	172	263	149	97.99	2.85	71.43	3054291	0	1	1	3054291	3054291	3054291	3054291	3054291	3054291	38.0	0.00	89.67	11	2667	4	252	7	0	0	0
+ONT_bin.2	g__Bacteroides (UID2691)	33	839	309	81.93	0.46	62.50	5130773	0	33	33	211788	211788	155477	155477	405112	405112	42.7	1.64	89.19	11	4231	155	676	8	0	0	0
+ONT_bin.3	o__Clostridiales (UID1226)	155	278	158	98.67	1.27	0.00	6427786	0	1	1	6427786	6427786	6427786	6427786	6427786	6427786	50.3	0.00	87.86	11	5776	5	272	0	1	0	0
+ONT_bin.4	root (UID1)	5656	56	24	0.00	0.00	0.00	482281	0	3	3	166602	166602	160760	160760	166615	166615	41.1	0.52	87.03	11	543	56	0	0	0	0	0
+ONT_bin.5	o__Clostridiales (UID1226)	155	278	158	63.40	0.00	0.00	3278464	0	31	31	141330	141330	105756	105756	511058	511058	49.4	1.66	88.26	11	3108	93	185	0	0	0	0
+ONT_bin.6	root (UID1)	5656	56	24	0.00	0.00	0.00	753739	0	5	5	230855	230855	150747	150747	247841	247841	45.3	0.86	84.97	11	773	56	0	0	0	0	0
+ONT_bin.7	o__Bacteroidales (UID2657)	160	490	268	99.13	0.75	0.00	6455207	0	1	1	6455207	6455207	6455207	6455207	6455207	6455207	42.7	0.00	90.70	11	5055	3	485	2	0	0	0
+ONT_bin.8	o__Bacteroidales (UID2621)	198	427	260	72.07	0.00	0.00	3472450	0	25	25	198197	198197	138898	138898	342879	342879	45.2	1.71	90.09	11	2911	102	325	0	0	0	0
+ONT_bin.9	k__Bacteria (UID203)	5449	104	58	8.62	0.00	0.00	382818	0	6	6	65540	65540	63803	63803	130590	130590	42.3	0.99	91.0711	297	99	5	0	0	0	0
+
+```
+So for filtering we need to select all genomes that have a *Completeness*(colum6) >= 70 and *Contamination	Strain* (colum 7). For this conditionals loops we can use the AWK that is a programming language for data extraction and reporting tool. The goal of this course is not to learn AWK so just let's talk about the basics: $ are references to colums (e.g. $6 meand colum 6); -F Command line option to specify input field delimiter (e.g. -F "\t" means the text is separated by tabs). awk '/pattern/ {action}' file↵Execute action for matched pattern 'pattern' on file 'file' (e.g awk -F "\t" '{if($6 > 70) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv means if colum 6 is greather than 70 print col.1 (ID), col.6(completeness) and col.7(Contamination)... This [cheatsheet](https://www.shortcutfoo.com/app/dojos/awk/cheatsheet) is a useful resource if you are interested in learn a bit more. 
+
+After this, let's filtering:
+
+```bash
+(/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ awk -F "\t" '{if($6 > 70) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv
+Bin Id	Completeness	Contamination
+ONT_bin.1	97.99	2.85
+ONT_bin.2	81.93	0.46
+ONT_bin.3	98.67	1.27
+ONT_bin.7	99.13	0.75
+ONT_bin.8	72.07	0.00
+```
+
+After printing this we notice the 
 
 
 
