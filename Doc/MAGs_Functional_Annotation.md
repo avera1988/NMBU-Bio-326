@@ -1,7 +1,7 @@
-# Prokaryotic functiona annotation
+# Prokaryotic functional annotation
 
-So far we were able to obtain indiviual metagenome assembled genomes (MAGs) from the xantan enrichment gut environment. Let's review our workflow 
-![workflow](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/wrokflowmetagenome.png)
+### So far we were able to obtain indiviual metagenome assembled genomes (MAGs) from the xantan enrichment gut environment. Let's review our workflow to see what is the next step: 
+![workflow](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/wrokflowmetagenome.png) 
 
 After binning with [MetaBat](https://bitbucket.org/berkeleylab/metabat/src/master/) we obtained 9 bins. We used [CheckM](https://ecogenomics.github.io/CheckM/) to asses the quality of these MAGs qnd this was the result after run the "qa" pipeline:
 
@@ -53,6 +53,10 @@ ensity   Translation table   # predicted genes    0     1    2   3   4   5+
 -----------------------------------------------------------------------------
 
 ```
+
+Now can start filtering the MAGs. A good criterion is to use the quality and contamination of the MAGs to separate them into *High*, *Medium* and *Low* quality MAGs. 
+We can use the following table from [Bowers et al.,](https://www.nature.com/articles/nbt.3893) to classify the MAGs:
+![tablemags](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/mags.jpg)
 
 
 
