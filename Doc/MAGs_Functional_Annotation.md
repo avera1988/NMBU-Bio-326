@@ -211,6 +211,146 @@ Now that we have this we can start the annotation using DRAM.
  ![dramaanot](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAM.jpg)
 
 
+Until now we have the MAGs, the checkM results and last [session](https://github.com/liveha/NMBU-BIO326/blob/main/Binning_metaBAT.md) we learned how to use [GTDBTK](https://github.com/Ecogenomics/GTDBTk). But we can run GTDBTK again using only the "GoodQuality" MAGs now. For this we need the script gtdbk.classifywf.SLURM.sh 
+
+```bash
+#!/bin/bash
+#########################################################################
+#	SLURM scrip for running gtdbtk on Orion cluster
+#		Dependencies: gtdbk conda environment
+#					  gtdbk.release95 db
+#					  fasta files of genomes (MAGs)
+#
+#	It copies the database and the MAGs to a local disk on any Orion's node 
+#	and runs locally. At the end it copies all the results to the PEP
+#	or any other path in the cluster into a MAGs_gtdbk.dir folder.
+#
+#	to run: 
+# sbatch gtdbk.sh path_to_MAGs_folder fasta_files_extension
+# eg: sbatch gtdbk.sh /fs-1/PEPomics01/auve/Metasalmon/gtdbktest fna
+#
+# Author: Arturo Vera
+# Jan 2021
+#########################################################################
+
+###############SLURM SCRIPT###################################
+
+## Job name:
+#SBATCH --job-name=gtdbk_classifywf
+#
+## Wall time limit:
+#SBATCH --time=08:00:00
+#
+## Other parameters:
+#SBATCH --cpus-per-task 12
+#SBATCH --mem=150G
+#SBATCH	--nodes=1
+#SBATCH --partition=hugemem
+###Basic usage help for this script#######
+
+print_usage() {
+        echo "Usage: sbatch $0 path_to_MAGs fasta_files_extension"
+        echo "eg: sbatch $0 /net/fs-1/PEPomics01/auve/Metasalmon/gtdbktest fna"
+}
+
+if [ $# -le 1 ]
+        then
+                print_usage
+                exit 1
+        fi
+
+
+###############Main SCRIPT###################################
+
+## Set up job environment:
+
+module --quiet purge  # Reset the modules to the system default
+module load Miniconda3
+
+##Declaring variables
+
+magsdir=$1
+ext=$2
+
+####Do some work:########
+
+## For debuggin
+
+echo "Hello " $USER 
+echo "my submit directory is"
+echo $SLURM_SUBMIT_DIR
+echo "this is the job:"
+echo $SLURM_JOB_ID
+echo "I am running on:"
+echo $SLURM_NODELIST
+echo "I am running with:"
+echo $SLURM_CPUS_ON_NODE "cpus"
+echo "Today is:"
+date
+
+## Copying data to local node for faster computation
+
+cd $TMPDIR
+
+#Check if $USER exists in $TMPDIR
+
+if [[ -d $USER ]]
+then
+        echo "$USER exists on $TMPDIR"
+else
+        mkdir $USER
+fi
+
+
+echo "copying files to $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID"
+
+cd $USER
+mkdir tmpDir_of.$SLURM_JOB_ID
+cd tmpDir_of.$SLURM_JOB_ID
+
+##Activate conda environments
+
+export PS1=\$
+source activate /mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/GTDBTK
+
+#Copy the MAGs to the $TMPDIR
+
+echo "copying MAGs to: " $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID
+cd $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID
+cp $magsdir/*$ext .   #the extension is the fasta file ext e.g. fna
+
+#Create a MAGs dir and move there the MAGs
+mkdir MAGs
+mv *.$ext MAGs/
+
+#####GTDBTK classify_wf pipeline################
+
+time gtdbtk classify_wf \
+--genome_dir MAGs \
+--out_dir MAGs_gtdbk.dir \
+-x $ext \
+--cpus $SLURM_CPUS_ON_NODE \
+
+cd $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID
+
+############ Moving results to PEP partition or anywhere the main script was submitted ################
+
+echo "moving results to" $SLURM_SUBMIT_DIR
+
+cd $TMPDIR/$USER/tmpDir_of.$SLURM_JOB_ID
+
+time cp -r MAGs_gtdbk.dir $SLURM_SUBMIT_DIR
+
+echo "gtdbk results are in" $SLURM_SUBMIT_DIR/MAGs_gtdbk.dir
+
+####removing tmp dir. Remember to do this for not filling the HDD in the node############
+
+cd $TMPDIR/$USER/
+rm -r tmpDir_of.$SLURM_JOB_ID
+
+echo "I've done at"
+date
+```
 
 
 
