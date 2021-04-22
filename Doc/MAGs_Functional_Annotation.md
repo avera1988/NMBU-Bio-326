@@ -112,8 +112,9 @@ usage: checkm qa [-h] [-o {1,2,3,4,5,6,7,8,9}]
 Assess bins for contamination and completeness.
                                         
 ```
-**The option we need is --tab_table and -f to save this into a file and not just printed to the standar input. We need the checkM results folder and the marker_files**
-```
+**The options we need are: --tab_table and -f to save this into a file and not just printed to the standar input. We need the checkM results folder and the marker_files**
+
+```bash
 (/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ checkm \
  qa \
  checkM_results/lineage.ms \
