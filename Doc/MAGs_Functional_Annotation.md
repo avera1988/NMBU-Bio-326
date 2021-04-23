@@ -151,7 +151,7 @@ ONT_bin.8	o__Bacteroidales (UID2621)	198	427	260	72.07	0.00	0.00	3472450	0	25	25
 ONT_bin.9	k__Bacteria (UID203)	5449	104	58	8.62	0.00	0.00	382818	0	6	6	65540	65540	63803	63803	130590	130590	42.3	0.99	91.0711	297	99	5	0	0	0	0
 
 ```
-4. So for filtering we need to select all genomes that have a *Completeness*(colum6) >= 70 and *Contamination	Strain* (colum 7). For this conditionals loops we can use the AWK that is a programming language for data extraction and reporting tool. The goal of this course is not to learn AWK so just let's talk about the basics: 
+4. So for filtering we need to select all genomes that have a *Completeness*(colum6) >= 70 and *Contamination	Strain* (colum 7). For this conditionals loops, we can use the AWK that is a programming language for data extraction and reporting tool. The goal of this course is not to learn AWK so just let's talk about the basics: 
 * $ are references to colums (e.g. $6 meand colum 6)
 * -F Command line option to specify input field delimiter (e.g. -F "\t" means the text is separated by tabs)
 * awk '/pattern/ {action}' file↵Execute action for matched pattern 'pattern' on file 'file' (e.g awk -F "\t" '{if($6 >= 70 && $7 <= 5) print $1"\t"$6"\t"$7}' ONT_qa_bins.tsv means if colum 6 is greather than 70 and colum 7 is lower than 5 print: col.1 (ID), col.6(completeness) and col.7(Contamination), all separated by tabs ("\t")... 
@@ -174,7 +174,7 @@ After printing this we notice that five bins matches our quality filter conditio
 (/net/cn-1/mnt/SCRATCH/bio326-21/GenomeAssembly/condaenvironments/checkM) [bio326-21-0@cn-16 MetagenomicMAGS]$ mkdir GoodQualityMAGs
 ```
 
-And then whe need to move all these five MAGs to that folder. We can do it manually, but we are a bioinformaticians, so let's use the computer to move this. For doing that we need to read the first colum (genome ID) and copy those genomes to the new folder GoodQualityMAGs. 
+And then whe need to move all these five MAGs to that folder. We can do it manually, but we are bioinformaticians, so let's use the computer to move this. For doing that we need to read the first colum (genome ID) and copy those genomes to the new folder GoodQualityMAGs. 
 
 The best way to do this is by using a *while* loop:
 * A basic example of while loop for reading "lines" in a file and print those lines (echo) to the standar ouput (screen) is: 
