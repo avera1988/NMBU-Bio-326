@@ -651,7 +651,7 @@ The files have different information:
 * product.html: Interactive heatmaps of the metabolic summaries
 * product.tsv: Tables to reproduce the heatmaps of above
 
-Let's check the main summary of genomic stats:
+Let's check the summary of genomic stats:
 
 ```bash
 [bio326-21-0@login dram.genome_summaries.GoodQualityMAGs.dir]$ more genome_stats.tsv 
@@ -666,8 +666,34 @@ ent	4 present	68	med
 ONT_bin.8	25	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannerellaceae;g__Parabacteroides;s__Parabacteroides distasonis	72.07	0.0	5 present	7 pres
 ent	6 present	68	med
 ```
+But if we would like to know how many genes were annotated per each genome, this info is not here. For doing that we need to extract them from the raw annotations. This file is located in ```dram.annotation.GoodQualityMAGs.dir``` so let's bring that file here and look into the file"
 
-All these files are visually friendly, so it is recommendable to export these data to our personal computers and take a look. **A guide on how to copy files from Orion to our personal computers can be find in the [BacterialGenomeAssemblyMiniON](https://github.com/avera1988/NMBU-Bio-326/blob/main/Doc/BacterialGenomeAssemblyMiniON.md) document.**
+```bash
+[bio326-21-0@login dram.genome_summaries.GoodQualityMAGs.dir]$ cp ../dram.annotation.GoodQualityMAGs.dir/annotations.tsv .
+[bio326-21-0@login dram.genome_summaries.GoodQualityMAGs.dir]$ head -2 annotations.tsv 
+	fasta	scaffold	gene_position	start_position	end_position	strandedness	rank	kegg_id	kegg_hit	peptidase_id	peptidase_family	peptidase_hit	peptidase_RBH	peptidase_identity	peptidase_bitScore	peptidase_eVal	pfam_hits	cazy_hits	vogdb_description	vogdb_categories	heme_regulatory_motif_count	bin_taxonomy	bin_completeness	bin_contamination
+ONT_bin.1_tig00000006_1	ONT_bin.1	tig00000006	1	3	218	-1	E													0d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Monoglobales_A;f__UBA1381;g__CAG-41;s__CAG-41 sp900066215	97.99	2.85
+```
+
+So this file, has all the genes that were predicted and annotated by DRAM. The first column has all the genes per each genome so we need to count those in order to know the number of genes per each genome. How to obtain that info, is not trivial and we need to do a little scripting for that. The following command line is an example of how we can use some simple ```bash``` commands to extract this information from the annotations file:
+
+```bash
+[bio326-21-0@login dram.annotation.GoodQualityMAGs.dir]$ more annotations.tsv |cut -f 1|cut -d _ -f 1,2|sort|uniq|awk '{if($1 ~ /^O/) print $1}'|while read line; do echo $line;grep -c $line annotations.tsv; done
+ONT_bin.1
+2692
+ONT_bin.2
+4253
+ONT_bin.3
+5856
+ONT_bin.7
+5076
+ONT_bin.8
+2901
+````
+
+Again, the main aim of this course is not to learn how to code, so do not panic, just try to look into the commands and try to make sense of them ...
+
+Although we can display the content of the *.tsv* files obtainded by DRAM here in the terminal, the  metabolism_summary.xlsx and product.html files are visually friendly, so it is recommendable to export these data to our personal computers and take a look. **A guide on how to copy files from Orion to our personal computers can be find in the [BacterialGenomeAssemblyMiniON](https://github.com/avera1988/NMBU-Bio-326/blob/main/Doc/BacterialGenomeAssemblyMiniON.md) document.**
 
 Once in your computer, you can open the product.html, to explore the metabolic potential of your MAGs.
 
@@ -675,8 +701,8 @@ Once in your computer, you can open the product.html, to explore the metabolic p
 
 is there any special metabolic pathway would you like to look at? 
 
-Now is time for the funny part that is parsing the information and to interpret the biological meaning ...
+Now is time for the funny part that is parsing the information and to interpret the biological meaning encoding in these MAGs ...
 
-### Enjoy DRAM and your annotated MAGs
+### Enjoy DRAM and have fun looking through your annotated MAGs
 
 
