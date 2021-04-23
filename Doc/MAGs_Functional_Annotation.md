@@ -675,10 +675,10 @@ But if we would like to know how many genes were annotated per each genome, this
 ONT_bin.1_tig00000006_1	ONT_bin.1	tig00000006	1	3	218	-1	E													0d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Monoglobales_A;f__UBA1381;g__CAG-41;s__CAG-41 sp900066215	97.99	2.85
 ```
 
-So this file, has all the genes that were predicted and annotated by DRAM. The first column has all the genes per each genome so we need to count those in order to know the number of genes per each genome. How to obtain that info, is not trivial and we need to do a little scripting for that. The following command line is an example of how we can use some simple ```bash``` commands to extract this information from the annotations file:
+So this file, has all the genes that were predicted and annotated by DRAM. The first column has all the genes per each genome so we need to count those in order to know the number of genes per each genome. How to obtain that info, is not trivial and we need to do a little scripting for that. The following command line is an example of how we can use some simple ```bash``` commands we have already used (more, cut, awk, while, grep ...) to extract this information from the annotations file:
 
 ```bash
-[bio326-21-0@login dram.annotation.GoodQualityMAGs.dir]$ more annotations.tsv |cut -f 1|cut -d _ -f 1,2|sort|uniq|awk '{if($1 ~ /^O/) print $1}'|while read line; do echo $line;grep -c $line annotations.tsv; done
+[bio326-21-0@login dram.annotation.GoodQualityMAGs.dir]$ more annotations.tsv |cut -f 1|cut -d _ -f 1,2|sort|uniq|awk '{if($1 ~ /^[[:alnum:]]/) print $1}'|while read line; do echo $line;grep -c $line annotations.tsv; done
 ONT_bin.1
 2692
 ONT_bin.2
@@ -691,7 +691,7 @@ ONT_bin.8
 2901
 ````
 
-Again, the main aim of this course is not to learn how to code, so do not panic, just try to look into the commands and try to make sense of them ...
+**Again, the main aim of this course is not to learn how to code, so do not panic, just to look into the commands and try to make sense of them ...**
 
 Although we can display the content of the *.tsv* files obtainded by DRAM here in the terminal, the  metabolism_summary.xlsx and product.html files are visually friendly, so it is recommendable to export these data to our personal computers and take a look. **A guide on how to copy files from Orion to our personal computers can be find in the [BacterialGenomeAssemblyMiniON](https://github.com/avera1988/NMBU-Bio-326/blob/main/Doc/BacterialGenomeAssemblyMiniON.md) document.**
 
