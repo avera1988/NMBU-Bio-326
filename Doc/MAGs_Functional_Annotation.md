@@ -651,6 +651,22 @@ The files have different information:
 * product.html: Interactive heatmaps of the metabolic summaries
 * product.tsv: Tables to reproduce the heatmaps of above
 
+Let's check the main summary of genomic stats:
+
+```bash
+[bio326-21-0@login dram.genome_summaries.GoodQualityMAGs.dir]$ more genome_stats.tsv 
+genome	number of scaffolds	taxonomy	completeness score	contamination score	5S rRNA	16S rRNA	23S rRNA	tRNA count	assembly quality
+ONT_bin.1	1	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Monoglobales_A;f__UBA1381;g__CAG-41;s__CAG-41 sp900066215	97.99	2.85	4 present	4 present	4 present	57	med
+ONT_bin.2	33	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides thetaiotaomicron	81.93	0.46	4 present	3 pres
+ent	3 present	60	med
+ONT_bin.3	1	d__Bacteria;p__Firmicutes_A;c__Clostridia;o__Lachnospirales;f__Lachnospiraceae;g__Enterocloster;s__Enterocloster sp000155435	98.67	1.27	5 present	5 pres
+ent	5 present	69	med
+ONT_bin.7	1	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides intestinalis_A	99.13	0.75	4 present	4 pres
+ent	4 present	68	med
+ONT_bin.8	25	d__Bacteria;p__Bacteroidota;c__Bacteroidia;o__Bacteroidales;f__Tannerellaceae;g__Parabacteroides;s__Parabacteroides distasonis	72.07	0.0	5 present	7 pres
+ent	6 present	68	med
+```
+
 All these files are visually friendly, so it is recommendable to export these data to our personal computers and take a look. **A guide on how to copy files from Orion to our personal computers can be find in the [BacterialGenomeAssemblyMiniON](https://github.com/avera1988/NMBU-Bio-326/blob/main/Doc/BacterialGenomeAssemblyMiniON.md) document.**
 
 Once in your computer, you can open the product.html, to explore the metabolic potential of your MAGs.
