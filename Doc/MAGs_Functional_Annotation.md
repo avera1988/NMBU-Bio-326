@@ -433,7 +433,7 @@ This is a multi-modular software:
 
 ![DRAMTOTAL](https://github.com/avera1988/NMBU-Bio-326/blob/main/images/DRAMtotal.jpg)
 
-We need to run the annotation and then DRAM is capable to extract and classify Metabolic trends (e.g carbohydrate active enzymes (CAZy) coding genes) and produce visual plots with the disill command.
+We need to run the annotation and then DRAM is capable to extract and classify Metabolic trends (e.g carbohydrate active enzymes (CAZy) coding genes) and produce visual plots with the distill command.
 
 Let's display the help of these two commands:
 
