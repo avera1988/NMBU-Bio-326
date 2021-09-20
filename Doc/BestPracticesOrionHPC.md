@@ -310,7 +310,7 @@ Here we can run short parsing scripts, test software with a small datasets, etc.
 
 ### Temporary working directory, faster and more efficient Jobs
 
-Generaly any software can read (data) and write (results) from any partition of the cluster (i.e. $HOME, $SCRATCH, $PROJECT), however, I/O (reading and writing) from those locations uses a lot of networ resulting in a high inefficenfy for heavy jobs (e.g mapping reads to large genomes or metagenomes). Also if multiple users run in the same way the traffic in the network eve using the infiniband makes the jobs super slow. 
+Generaly any software can read (data) and write (results) from any partition of the cluster (i.e. $HOME, $SCRATCH, $PROJECT), however, I/O (reading and writing) from those locations uses a lot of network-trafic resources resulting in a high inefficenfy for heavy jobs (e.g mapping reads to large genomes or metagenomes). Also if multiple users run in the same way the traffic in the network, even using the infiniband, makes the jobs super slow. 
 To avoid this we can take advantage of the **$TMPDIR** partition. This is a physical hard-drive allocated in each of the compute nodes. We can migrate the data to here for I/O. Often, quite some efficiency can be gained by doing this.
 
 Let's take a look, first we need to check if our **$USER** exists in that **$TMPDIR**
